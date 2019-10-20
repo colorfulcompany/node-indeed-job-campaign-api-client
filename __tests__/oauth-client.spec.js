@@ -1,4 +1,4 @@
-/* global describe, it */
+/* global describe, it, beforeEach, afterEach */
 /* eslint camelcase: ['error', {allow: ['[a-z]*_token',
                                         'expires_in',
                                         'token_type',
@@ -33,7 +33,7 @@ describe('OAuthClient', () => {
   })
 
   describe('with mock', () => {
-    beforeEach(() => { // eslint-disable-line
+    beforeEach(() => {
       client = new OAuthClient({ client_id: '', secret: '', redirect_uri: '' })
     })
 
@@ -60,7 +60,7 @@ describe('OAuthClient', () => {
       var future = moment('2019-10-18T08:00:00').format()
       var duration = 3600
 
-      beforeEach(() => { // eslint-disable-line
+      beforeEach(() => {
         sinon.stub(client, 'now').callsFake(() => moment('2019-10-18T07:00:00'))
       })
     
@@ -92,7 +92,7 @@ describe('OAuthClient', () => {
       }
 
       describe('token stored at 20min before, and expires_in 10min', () => {
-        beforeEach(() => { // eslint-disable-line
+        beforeEach(() => {
           setExpiredForPasttime(m('2019-10-17T12:00:00'), 600)
         })
 
@@ -103,7 +103,7 @@ describe('OAuthClient', () => {
       })
 
       describe('token stored at 10min before, and expires_in 20min', () => {
-        beforeEach(() => { // eslint-disable-line
+        beforeEach(() => {
           setExpiredForPasttime(m('2019-10-17T12:00:00'), 1200)
         })
 
@@ -147,11 +147,11 @@ describe('OAuthClient', () => {
       })
 
       describe('complete', () => {
-        beforeEach(() => { // eslint-disable-line
+        beforeEach(() => {
           sinon.mock(client).expects('setTokenExpiresIn').once()
         })
 
-        afterEach(() => { // eslint-disable-line
+        afterEach(() => {
           sinon.restore()
         })
 
