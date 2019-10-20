@@ -23,8 +23,7 @@ describe('OAuthClient', () => {
         redirect_uri: '',
         access_token: '',
         refresh_token: '',
-        expires_in: 0,
-        token_type: 'Bearer'
+        expires_in: 0
       })
 
       const token = await client.accessToken()
@@ -63,7 +62,7 @@ describe('OAuthClient', () => {
       beforeEach(() => {
         sinon.stub(client, 'now').callsFake(() => moment('2019-10-18T07:00:00'))
       })
-    
+
       it('set seconds return new moment', () => {
         assert.equal(client.setTokenExpiresIn(duration).format(), future)
       })
@@ -150,14 +149,29 @@ describe('OAuthClient', () => {
         beforeEach(() => {
           sinon.mock(client).expects('setTokenExpiresIn').once()
         })
-
         afterEach(() => {
           sinon.restore()
         })
-
         it('return same data', () => {
           const tokenInfo = { access_token: '', refresh_token: '', token_type: '', expires_in: 600 }
           assert.deepEqual(client.setTokens(tokenInfo), tokenInfo)
+
+          sinon.verify()
+        })
+      })
+
+      describe('token_type prop has default', () => {
+        beforeEach(() => {
+          sinon.mock(client).expects('setTokenExpiresIn').once()
+        })
+        afterEach(() => {
+          sinon.restore()
+        })
+        it('default token_type is Bearer', () => {
+          const tokenInfo = { access_token: '', refresh_token: '', expires_in: 600 }
+          assert.deepEqual(
+            client.setTokens(tokenInfo),
+            { access_token: '', refresh_token: '', token_type: 'Bearer', expires_in: 600 })
 
           sinon.verify()
         })

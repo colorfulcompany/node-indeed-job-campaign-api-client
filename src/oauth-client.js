@@ -17,7 +17,9 @@ class OAuthClient {
     this._tokenWillExpiredAt = undefined
 
     this.setRedirectUri(config.redirect_uri)
-    this.setTokens(config)
+    if (Object.keys(config).length > 0) {
+      this.setTokens(config)
+    }
 
     this.oauth = new OAuth2(
       config.client_id,
@@ -69,7 +71,7 @@ class OAuthClient {
   get tokenInfo () {
     return this._tokenInfo
   }
-  
+
   /**
    * @return {Array}
    */
@@ -91,18 +93,27 @@ token_type
 redirect_uri
 `.trim().split('\n')
   }
-  
+
+  /**
+   * @return {string}
+   */
+  get defaultTokenType () {
+    return 'Bearer'
+  }
+
   /**
    * @param {object} config
    * @return {object|boolean}
    */
   setTokens (config) {
+    const tokens = { token_type: this.defaultTokenType, ...config }
+
     var tokenInfo = {}
     const receivingKeys = this.tokenKeysWillReceive()
 
     receivingKeys.forEach((key) => {
-      if (typeof config[key] !== 'undefined') {
-        tokenInfo[key] = config[key]
+      if (typeof tokens[key] !== 'undefined') {
+        tokenInfo[key] = tokens[key]
       }
     })
 
@@ -146,7 +157,7 @@ redirect_uri
 
     return (willExpiredAt) ? this.now() > willExpiredAt : true
   }
-  
+
   /**
    * @return {object}
    */
