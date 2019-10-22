@@ -1,0 +1,4625 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Use this API to get information about and manage an Indeed employer's sponsored job campaigns.  <h2>Authentication</h2><p>To get API credentials, see <a href='http://opensource.indeedeng.io/api-documentation/docs/campaigns/auth/'>Authentication</a>.</p> <h2>Deprecated resources</h2> <p>If a resource in this document is marked <strong>deprecated</strong>, we advise you to update your integration and stop using it. Deprecated resources will no longer be available in the future. </p> <h2>Limited-release (beta) resources</h2> <p>If a resource in this document is marked <strong>limited-release (beta)</strong>, it is not available to all consumers of this API. The resource is available to particular API users by invitation only. </p> <h2>Rate limiting</h2><p>Indeed applies rate limiting to this API. This ensures system stability against unauthorized or unexpected use.</p> <h2>Contact Us</h2><p>For further questions, not answered in this document, send an email to <a href='mailto:ads-api@indeed.com'>ads-api@indeed.com</a>.</p>",
+    "version": "1.0.0",
+    "title": "Sponsored Job Campaigns API"
+  },
+  "host": "localhost:9292",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "Account management"
+    },
+    {
+      "name": "Campaign management"
+    },
+    {
+      "name": "Hosted jobs (deprecated)"
+    },
+    {
+      "name": "Reports"
+    },
+    {
+      "name": "Detailed reports (beta) (limited release)"
+    }
+  ],
+  "paths": {
+    "/v1/account": {
+      "get": {
+        "tags": [
+          "Account management"
+        ],
+        "summary": "Get an employer's Indeed advertiser account information.",
+        "description": "<p>Get an employer's Indeed advertiser account information.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/account?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "getEmployerInfo",
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "$ref": "#/definitions/meta"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/account"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/subaccounts": {
+      "get": {
+        "tags": [
+          "Account management"
+        ],
+        "summary": "Get a list of advertiser subaccounts",
+        "description": "<p>Get a complete list of advertiser subaccounts.<br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/>Not available for Individual Employers</p> <p><strong>Ad Agencies</strong><br/>If you represent multiple Indeed employers (have a master account), get a complete list of all subaccounts associated with your account.</p>",
+        "operationId": "getSubaccounts",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "$ref": "#/definitions/meta"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "SubAccountList": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/subAccount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account management"
+        ],
+        "summary": "Create a new advertiser subaccount",
+        "description": "<p>Create a new advertiser subaccount.<br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/>Not available for Individual Employers</p> <p><strong>Ad Agencies</strong><br/>If you represent multiple Indeed employers (have a master account), create a new subaccount associated with your account.</p>",
+        "operationId": "createSubaccount",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "The email for the subaccount. Example: <code>subaccount@advertiser.com</code>",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "currencyCode",
+            "in": "query",
+            "description": "The 3-letter currency code used for the subaccount. Example: <code>USD</code>",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "The 2-letter language code used for the subaccount. Example: <code>en</code>",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "employeeCount",
+            "in": "query",
+            "description": "The number of employees. Possible values are: 1-49, 50-149, 150-249, 250-499, 500-749, 750-999, 1000+",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "example": null
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "3141592653589793"
+                    },
+                    "company": {
+                      "type": "string",
+                      "example": "Indeed"
+                    },
+                    "email": {
+                      "example": "admin@indeed.com",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid language"
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/subaccounts"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/subaccounts"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/budget": {
+      "get": {
+        "tags": [
+          "Account management"
+        ],
+        "summary": "Get your monthly jobs budget",
+        "description": "<p>Get an employer's monthly jobs budget.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/account/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "getBudget",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": 12
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "prev"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "Campaigns": {
+                      "type": "object",
+                      "properties": {
+                        "jobsMonthlyBudget": {
+                          "type": "number",
+                          "example": 5000000
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Account management"
+        ],
+        "summary": "Update your monthly jobs budget",
+        "description": "<p>To update an employer's monthly jobs budget, pass a new numeric value for <code>jobsMonthlyBudget</code> in the request body. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/account/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "updateBudget",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "<p>(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.</p>"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/accountBudgetPatch"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": 12
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "prev"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "string",
+                  "example": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/account"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns": {
+      "get": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Get a list of an employer's campaigns and their statuses",
+        "description": "<p>Get a list of an employer's campaigns and their statuses. The results may be paginated. For example:<br/><pre>http://localhost:9292/v1/campaigns?start=784e4acec9x100z2&perPage=12&type=SOURCE&status=ACTIVE</pre></p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "showCampaignList",
+        "produces": [
+          "application/json",
+          "text/csv"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "type": "integer",
+            "description": "The maximum number of entries displayed on one page.",
+            "required": false
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "type": "string",
+            "description": "The ID of the starting campaign in the response.",
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The job status. To filter the results by job status, pass either <code>ACTIVE</code>, <code>DELETED</code>, <code>PAUSED</code> or <code>ALL</code>."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The type of job. To filter the results by job type, pass either <code>SOURCE</code> or <code>HOSTED</code>."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": 12
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "prev"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns?start=Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "Campaigns": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "example": "Hand Model Spring 2019"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "example": "Av16isrH7Q6odKYa"
+                        },
+                        "Status": {
+                          "type": "string",
+                          "example": "ACTIVE"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Creates a new campaign",
+        "description": "<p>Create a new sponsored job campaign. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "createCampaign",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/campaign"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "Campaign Info"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "campaignId": {
+                      "type": "string",
+                      "example": "Av16isrH7Q6odKYa"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}": {
+      "get": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Get an employer's campaign details",
+        "description": "<p>Get an employer's campaign details. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p><pre>http://localhost:9292/v1/campaigns/Av16isrH7Q6odKYa?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "showCampaignInfo",
+        "produces": [
+          "application/json",
+          "text/csv; header=present"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "The campaign ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string",
+                      "example": "Hand Model 2019"
+                    },
+                    "Id": {
+                      "type": "string",
+                      "example": "Av16isrH7Q6odKYa"
+                    },
+                    "Type": {
+                      "type": "string",
+                      "example": "SOURCE"
+                    },
+                    "Status": {
+                      "type": "string",
+                      "example": "ACTIVE"
+                    },
+                    "CurrencyCode": {
+                      "type": "string",
+                      "example": "USD"
+                    },
+                    "MaxCostPerClick": {
+                      "type": "string",
+                      "example": 0.25
+                    },
+                    "DailyBudget": {
+                      "type": "string",
+                      "example": 410
+                    },
+                    "TrackingToken": {
+                      "type": "string",
+                      "example": "HM2019"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Update general campaign information",
+        "description": "<p>Update some general campaign information. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns/Av16isrH7Q6odKYa?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "updateCampaign",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "encrypted campaign id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/updateCampaign"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "campaignId": {
+                      "type": "string",
+                      "example": "cda7fa7645b613d5"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}/budget": {
+      "get": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Get a campaign's budget information",
+        "description": "<p>Get a campaign's budget information. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns/cda7fa7645b613d5/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p> ",
+        "operationId": "getCampaignBudget",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "encrypted campaign id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "budgetOptimizationTarget": {
+                      "type": "string",
+                      "example": "automatic"
+                    },
+                    "budgetOneTimeLimit": {
+                      "type": "string",
+                      "example": 10000
+                    },
+                    "budgetMonthlyLimit": {
+                      "type": "string",
+                      "example": 10000
+                    },
+                    "budgetDailyLimit": {
+                      "type": "string",
+                      "example": 100
+                    },
+                    "maxCpc": {
+                      "type": "number",
+                      "example": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Update a campaign's budget information",
+        "description": "<p>Update a campaign's budget information. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns/cda7fa7645b613d5/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p> ",
+        "operationId": "updateCampaignBudget",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "encrypted campaign id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/campaignBudget"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "campaignId": {
+                      "type": "string",
+                      "example": "cda7fa7645b613d5"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}/jobCount": {
+      "get": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Get the job count for a campaign",
+        "description": "<p>Get the count of jobs for a campaign. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns/Av16isrH7Q6odKYa/jobCount?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "getCampaignJobCount",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "encrypted campaign id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "number",
+                  "example": 7
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/cda7fa7645b613d5"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}/properties": {
+      "get": {
+        "tags": [
+          "Campaign management"
+        ],
+        "summary": "Get key dates of an employer's campaign",
+        "description": "<p>Get key date information of an employer's campaign. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p><pre>http://localhost:9292/v1/campaigns/Av16isrH7Q6odKYa?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "showCampaignProperties",
+        "produces": [
+          "application/json",
+          "text/csv; header=present"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "The campaign ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "integer",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "dateCreated": {
+                      "type": "string",
+                      "example": "2019-01-17"
+                    },
+                    "firstSpendDate": {
+                      "type": "string",
+                      "example": "2019-01-30"
+                    },
+                    "lastSpendDate": {
+                      "type": "string",
+                      "example": "2019-04-15"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}/stats": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get campaign statistics for a date range or a list of campaign dates.",
+        "description": "<p>If you pass a date range using the <code>startDate</code> and <code>endDate</code> query parameters, this endpoint returns campaign statistics for that date range, similar to the <code>v1/campaigns/&lt;campaignId&gt;/stats/{date}</code> endpoint. If you pass a start date using the <code>start</code> parameter, you get a list of campaign entry dates.  <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.qa.indeed.net/api/v1/stats?startDate=2018-06-01&endDate=2018-06-02&v=2</pre>\n<p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "showAdvertisementStatsRootPage",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "The campaign ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed `advertiserId`.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "(Optional) The start of the date range, inclusive. This returns campaign statistics for the date range endpoint. Use the <code>merge</code> parameter to merge the statistics into one campaign statistic response that is a sum of statistics for the date range.",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "(Optional) The end of the date range, exclusive",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "(Optional) The start date. This returns a list of campaign entry dates starting with the start date inclusive.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "merge",
+            "in": "query",
+            "type": "boolean",
+            "description": "(Optional) Whether to merge the campaign statistic results. Possible values are <code>true</code> and <code>false</code>."
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "The maximum number of entries displayed on one page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": 30
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/Av16isrH7Q6odKYa/"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "EntryDates": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "2019-01-29"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/campaigns/{campaignId}/stats/{date}": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a campaign's traffic statistics for a particular date",
+        "description": "<p>Get a sponsored job's campaign traffic statistics for a particular date. <br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p> <p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/campaigns/Av16isrH7Q6odKYa/stats/2019-02-25?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "showAdvertisementStatsEntryDateDetails",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "campaignId",
+            "in": "path",
+            "description": "The campaign ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "path",
+            "description": "The date, in the format `YYYY-MM-DD`, for which you would like to see campaign traffic statistics. Pass this parameter in the path. For example, `/campaigns/Av16isrH7Q6odKYa/stats/2019-02-25`. ",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "required": false,
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed `advertiserId`.",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "/v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string",
+                      "description": "The campaign name",
+                      "example": "Hand Model"
+                    },
+                    "Id": {
+                      "type": "string",
+                      "description": "The campaign ID",
+                      "example": "Av16isrH7Q6odKYa"
+                    },
+                    "Date": {
+                      "type": "string",
+                      "description": "The date of the recorded campaign traffic statistics",
+                      "example": "2019-02-25"
+                    },
+                    "Clicks": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "The number of sponsored clicks for the campaign on the specified day",
+                      "example": 169
+                    },
+                    "Impressions": {
+                      "type": "integer",
+                      "description": "The number of people who viewed the sponsored campaign on that day",
+                      "format": "int32",
+                      "example": 2825
+                    },
+                    "Conversions": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "The number of applications resulting from direct clicks on your ad campaign on the specified day.",
+                      "example": 3
+                    },
+                    "AveragePage": {
+                      "type": "number",
+                      "description": "The ratio of ad clicks to impressions, or the click-through rate.",
+                      "example": 2.4432515
+                    },
+                    "CurrencyCode": {
+                      "type": "string",
+                      "example": "GBP"
+                    },
+                    "Cost": {
+                      "type": "string",
+                      "example": "0.45"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/campaigns/Av16isrH7Q6odKYa/stats"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stats": {
+      "get": {
+        "tags": [
+          "Detailed reports (beta) (limited release)"
+        ],
+        "summary": "Request a detailed campaign traffic report for a specified date range.",
+        "description": "<p><strong>Note:</strong> This is a limited-release API. It is currently in Beta test status.<br/>&nbsp;</p><p>Use this resource to request a link to a detailed report. A successful request returns HTTP status code <code>202 ACCEPTED</code> and a <code>Location</code> header containing the path to the report. The report is in CSV format. The path to the report uses the <code>/v1/stats/{reportId}</code> resource. Refer to this resource for more information. </p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>http://localhost:9292/v1/stats?startDate=2019-02-25&endDate=2019-02-28&advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "requestTrafficStatsReport",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "The start date of the campaign traffic report, inclusive, in the format `YYYY-MM-DD`.",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "The end date of the campaign traffic report, exclusive, in the format `YYYY-MM-DD`.",
+            "required": true,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "description": "The report version. <br/>`1` - Legacy version 1<br/>`2` - Legacy version 2 containing the Ad ID column<br/>`3` - Legacy version 3 containing the Campaign ID and Ad ID columns <br/>`4` - The preferred report version containing the Campaign ID",
+            "required": false,
+            "type": "string",
+            "default": "1",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          {
+            "name": "hourlyBreakdown",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "This parameter has been deprecated and is no longer used."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The path to the report",
+                "x-example": "/v1/stats/68dd7bee34c4846dfea43875405836"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stats/{reportId}": {
+      "get": {
+        "tags": [
+          "Detailed reports (beta) (limited release)"
+        ],
+        "summary": "Get a detailed campaign traffic report.",
+        "description": "<p><strong>Note:</strong> This is a limited-release API. It is currently in Beta test status.<br/>&nbsp;</p><p>To retrieve the report, make a GET request to the report URL. For example:</p> <pre>http://localhost:9292/v1/stats/68dd7bee34c4846dfea43875405836</code></pre> <p>If the response is <code>202</code>, check back later. <br/>If the response is <code>200</code>, you'll receive the CSV formatted report. <br/><strong>Example report</strong><br/><pre>Ad ID,Advertisement,Job,Job Reference Number,Platform,Clicks,Impressions,Conversions,Spend (currency)<br/>ecc0e827cc1650c1,\"Hand Model\",D6US908,mobile,4.0,233,1.0,3.43 (USD)</pre></p>",
+        "operationId": "showTrafficStatsReport",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "reportId",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "description": "The ID of the report that the <code>v1/stats/</code> resource returns in a location header."
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "description": "The report version. <br/>`1` - Legacy version 1<br/>`2` - Legacy version 2 containing the Ad ID column<br/>`3` - Legacy version 3 containing the Campaign ID and Ad ID columns <br/>`4` - The preferred report version containing the Campaign ID",
+            "required": false,
+            "type": "string",
+            "default": "1",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The path to the report",
+                "x-example": "/v1/stats/68dd7bee34c4846dfea43875405836"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/hostedjobs": {
+      "get": {
+        "tags": [
+          "Hosted jobs (deprecated)"
+        ],
+        "summary": "Get the statuses of an employer’s jobs hosted on indeed.com",
+        "description": "<p>Get the statuses of an employer’s jobs hosted on <a href='http://www.indeed.com'>indeed.com</a>.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:<br/> <pre>http://localhost:9292/v1/hostedjobs?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "getJobs",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "type": "integer",
+            "description": "The maximum number of entries displayed on one page.",
+            "required": false
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "type": "string",
+            "description": "The offset of the hosted jobs list.",
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "The job status. To filter the results by job status, pass either <code>ACTIVE</code>, <code>DELETED</code>, <code>PAUSED</code> or <code>ALL</code>."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "9171a76ffcf3"
+                    },
+                    "last_modified_timestamp": {
+                      "type": "string",
+                      "example": 1538359476000
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "ACTIVE"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/hostedjobs/{jobId}": {
+      "get": {
+        "tags": [
+          "Hosted jobs (deprecated)"
+        ],
+        "summary": "Get the details of a single job",
+        "description": "Get the details of an employer's jobs hosted on <a href='http://www.indeed.com'>indeed.com</a><br/><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example: <br/> <pre>`http://localhost:9292/v1/hostedjobs/9171a76ffcf3?advertiserId=acd7ac45363e5e14`</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "operationId": "getHostedJobsDetails",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "description": "The job ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "advertiserId",
+            "in": "query",
+            "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "The format of the response. It can be `application/json`, `json text/csv` or `csv`.",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "errors": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "job": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/job"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INVALID_REQUEST"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Invalid date range."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "NOT_FOUND"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Resource not found."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "INTERNAL_SERVER_ERROR"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Failed to process given request."
+                        }
+                      }
+                    },
+                    "rootLocation": {
+                      "type": "string",
+                      "example": "http://localhost:9292"
+                    },
+                    "perPage": {
+                      "type": "object",
+                      "example": null
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "rel": {
+                          "type": "string",
+                          "example": "up"
+                        },
+                        "href": {
+                          "type": "string",
+                          "example": "v1/hostedjobs"
+                        }
+                      }
+                    }
+                  }
+                },
+                "data": {
+                  "type": "object",
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "accountBudgetPatch": {
+      "type": "object",
+      "properties": {
+        "jobsMonthlyBudget": {
+          "type": "number",
+          "example": 2000000
+        }
+      }
+    },
+    "account": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "john.smithsonian@indeed.com",
+          "description": "The employer's email address"
+        },
+        "id": {
+          "type": "string",
+          "example": "3066145960454562",
+          "description": "The employer ID"
+        },
+        "contact": {
+          "type": "string",
+          "example": "John Smithsonian",
+          "description": "The employer's primary point of contact"
+        },
+        "company": {
+          "type": "string",
+          "example": "Indeed",
+          "description": "The employer's company name"
+        },
+        "jobSourceList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "3141592653589793"
+              },
+              "siteName": {
+                "type": "string",
+                "example": "Indeed.com"
+              }
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200,
+          "description": "The HTTP status code of the request."
+        },
+        "errors": {
+          "description": "Any errors associated with the request. If there are no errors, the value of `errors` is `null`.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "The name of the error, such as `RESOURCE_NOT_FOUND`."
+            },
+            "description": {
+              "type": "string",
+              "description": "More details describing the error, such as `Couldn't locate the requested resource`."
+            }
+          }
+        },
+        "rootLocation": {
+          "type": "string",
+          "example": "http://employers.indeed.com/api",
+          "description": "The root URL of the relative paths in the response."
+        },
+        "perPage": {
+          "type": "integer",
+          "format": "int32",
+          "example": 2,
+          "description": "The maximum number of entries displayed on one page."
+        },
+        "links": {
+          "type": "object",
+          "description": "The links related to the resource.",
+          "properties": {
+            "rel": {
+              "type": "string",
+              "enum": [
+                "up",
+                "prev",
+                "next"
+              ],
+              "example": "next",
+              "description": "How the link is related to the resource, up one level in the path or, if paginated, the previous / next page of information."
+            },
+            "href": {
+              "type": "string",
+              "example": "/v1/campaigns/3141592653589793",
+              "description": "The link URL string. "
+            }
+          }
+        }
+      }
+    },
+    "subAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "3141592653589793"
+        },
+        "company": {
+          "type": "string",
+          "example": "Indeed"
+        },
+        "email": {
+          "example": "admin@indeed.com",
+          "type": "string"
+        }
+      }
+    },
+    "campaignStatistics": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "description": "The campaign name",
+          "example": "Hand Model"
+        },
+        "Id": {
+          "type": "string",
+          "description": "The campaign ID",
+          "example": "Av16isrH7Q6odKYa"
+        },
+        "StartDate": {
+          "type": "string",
+          "description": "The date of the recorded campaign traffic statistics",
+          "example": "2019-02-25"
+        },
+        "EndDate": {
+          "type": "string",
+          "description": "The date of the recorded campaign traffic statistics",
+          "example": "2019-03-31"
+        },
+        "Clicks": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of sponsored clicks for the campaign on the specified day",
+          "example": 169
+        },
+        "Impressions": {
+          "type": "integer",
+          "description": "The number of people who viewed the sponsored campaign on that day",
+          "format": "int32",
+          "example": 2825
+        },
+        "Conversions": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of applications resulting from direct clicks on your ad campaign on the specified day.",
+          "example": 3
+        },
+        "AveragePage": {
+          "type": "number",
+          "description": "The ratio of ad clicks to impressions, or the click-through rate.",
+          "example": 2.4432515
+        }
+      }
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The job ID",
+          "example": "9171a76ffcf3"
+        },
+        "last_modified_timestamp": {
+          "type": "integer",
+          "description": "The timestamp when the job in milliseconds from the Unix epoch.",
+          "example": "1406593851000"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "PAUSED",
+            "DELETED"
+          ],
+          "description": "The job status.",
+          "example": "ACTIVE"
+        },
+        "title": {
+          "type": "string",
+          "description": "The job title",
+          "example": "Data Scientist"
+        },
+        "description": {
+          "type": "string",
+          "description": "The job description",
+          "example": "Do cool things with our data."
+        },
+        "description_html": {
+          "type": "string",
+          "description": "The job description in HTML format",
+          "example": "<p>Do cool things with our data.</p>"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "One or more job locations",
+            "example": "Austin, TX"
+          }
+        },
+        "company": {
+          "type": "string",
+          "description": "The company name",
+          "example": "Indeed"
+        },
+        "url": {
+          "type": "string",
+          "description": "The page to view the job details."
+        },
+        "indeed_apply_data": {
+          "type": "string",
+          "description": "The URL parameter string of the Indeed Apply data."
+        }
+      }
+    },
+    "campaignBudget": {
+      "type": "object",
+      "required": [
+        "switchToBudgetOptimizationTarget"
+      ],
+      "properties": {
+        "switchToBudgetOptimizationTarget": {
+          "type": "string",
+          "example": "AUTOMATIC",
+          "enum": [
+            "AUTOMATIC",
+            "BIDFORCLICKS"
+          ],
+          "description": "The budget optimization target. If you set `budgetOptimizationTarget` to `AUTOMATIC`, you must set either the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetOnetimeLimit": {
+          "type": "number",
+          "example": 10000,
+          "description": "A one time budget limit for the campaign. You cannot set `budgetOnetimeLimit` and `budgetMonthlyLimit` at the same time. If you set the `budgetOptimizationTarget` to `AUTOMATIC`, you must set the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetMonthlyLimit": {
+          "type": "number",
+          "example": 10000,
+          "description": "A monthly budget limit for the campaign. You cannot set `budgetOnetimeLimit` and `budgetMonthlyLimit` at the same time. If you set the `budgetOptimizationTarget` to `AUTOMATIC`, you must set the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetDailyLimit": {
+          "type": "number",
+          "example": 100,
+          "description": "The daily budget limit for the campaign. If you set `budgetOptimizationTarget` to `AUTOMATIC`, do not set the `budgetDailyLimit`. It is automatically calculated."
+        },
+        "budgetFirstMonthBehavior": {
+          "type": "string",
+          "example": "startNowFullAmount",
+          "description": "First month behavior of monthly budget campaign.",
+          "enum": [
+            "startNowProratedAmount",
+            "startNowFullAmount",
+            "startNextMonthFullAmount"
+          ]
+        },
+        "maxCpc": {
+          "type": "number",
+          "example": 100,
+          "description": "Required when budgetOptimizationTarget is bidForClicks. If budgetOptimizationTarget is automatic, maxCpc is automatically calculated. Do not set this."
+        },
+        "budgetOnetimeDuration": {
+          "type": "integer",
+          "format": "int32",
+          "example": 10,
+          "description": "The duration of one time budget ads. Required when the `budgetOptimizationTarget` is automatic and the `budgetOnetimeLimit` is set."
+        }
+      }
+    },
+    "updateCampaign": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The unique name of the campaign",
+          "example": "Data Scientist"
+        },
+        "trackingToken": {
+          "type": "string",
+          "example": "data_scientist_02-19",
+          "description": "A unique tracking token for this campaign"
+        },
+        "status": {
+          "type": "string",
+          "example": "ACTIVE",
+          "description": "The status of the campaign.",
+          "enum": [
+            "ACTIVE",
+            "PAUSED",
+            "DELETED"
+          ]
+        },
+        "jobsToInclude": {
+          "type": "string",
+          "example": "ALL",
+          "description": "Choose to sponsor all jobs from this source or a subset of jobs. If you choose all, we ignore the fields that start with `jobs`.",
+          "enum": [
+            "ALL",
+            "QUERY"
+          ]
+        },
+        "jobsQuery": {
+          "type": "string",
+          "example": "software engineer",
+          "description": "The keyword(s) of the job query"
+        },
+        "jobsTitle": {
+          "type": "string",
+          "example": "software engineer",
+          "description": "The job titles to include in the query"
+        },
+        "jobsCompany": {
+          "type": "string",
+          "example": "Indeed",
+          "description": "The hiring companies to include in the query"
+        },
+        "jobsLocation": {
+          "type": "string",
+          "example": "Austin",
+          "description": "The locations to include in the query"
+        },
+        "jobsLocationRadius": {
+          "type": "integer",
+          "format": "int32",
+          "example": 5,
+          "description": "The job location radius. This field only accepts 5, 10, 15, 25, 50, or 100"
+        }
+      }
+    },
+    "campaign": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Hand Model",
+          "description": "The campaign name"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ACTIVE",
+            "DELETED",
+            "PAUSED"
+          ],
+          "example": "ACTIVE",
+          "description": "The job status"
+        },
+        "trackingToken": {
+          "type": "string",
+          "example": "indeed_chi",
+          "description": "The ad tracking token (append_url)"
+        },
+        "jobsSource": {
+          "type": "integer",
+          "example": "89432",
+          "description": "Pass either a `jobSource` or `jobsSourceId`. This will be deprecated. Use `jobsSourceId` instead. "
+        },
+        "jobsSourceId": {
+          "type": "string",
+          "example": "3141592653589793",
+          "description": "Pass either a `jobSource` or `jobsSourceId`. Each campaign only supports one `jobsSourceId`. If you have multiple job source IDs, create a separate campaign for each one. Use the `/v1/account` resource to get the `jobsSourceId`."
+        },
+        "jobsToInclude": {
+          "type": "string",
+          "example": "ALL",
+          "description": "Choose to sponsor all jobs from this source or a subset of jobs. If you choose all, we ignore the fields that start with `jobs`.",
+          "enum": [
+            "ALL",
+            "QUERY"
+          ]
+        },
+        "jobsQuery": {
+          "type": "string",
+          "example": "Java",
+          "description": "The keyword(s) of the job query"
+        },
+        "jobsTitle": {
+          "type": "string",
+          "example": "software engineer",
+          "description": "The job titles to include in the query"
+        },
+        "jobsCompany": {
+          "type": "string",
+          "example": "Indeed",
+          "description": "The hiring companies to include in the query"
+        },
+        "jobsLocation": {
+          "type": "string",
+          "example": "Austin",
+          "description": "The locations to include in the query"
+        },
+        "jobsLocationRadius": {
+          "type": "integer",
+          "format": "int32",
+          "example": 5,
+          "description": "The job location radius. This field only accepts 5, 10, 15, 25, 50, or 100"
+        },
+        "budgetOptimizationTarget": {
+          "type": "string",
+          "example": "AUTOMATIC",
+          "enum": [
+            "AUTOMATIC",
+            "BIDFORCLICKS"
+          ],
+          "description": "The budget optimization target. If you set `budgetOptimizationTarget` to `AUTOMATIC`, you must set either the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetOnetimeLimit": {
+          "type": "number",
+          "example": 10000,
+          "description": "A one time budget limit for the campaign. You cannot set `budgetOnetimeLimit` and `budgetMonthlyLimit` at the same time. If you set the `budgetOptimizationTarget` to `AUTOMATIC`, you must set the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetMonthlyLimit": {
+          "type": "number",
+          "example": 10000,
+          "description": "A monthly budget limit for the campaign. You cannot set `budgetOnetimeLimit` and `budgetMonthlyLimit` at the same time. If you set the `budgetOptimizationTarget` to `AUTOMATIC`, you must set the `budgetOnetimeLimit` or the `budgetMonthlyLimit`."
+        },
+        "budgetDailyLimit": {
+          "type": "number",
+          "example": 100,
+          "description": "The daily budget limit for the campaign. If you set `budgetOptimizationTarget` to `AUTOMATIC`, do not set the `budgetDailyLimit`. It is automatically calculated."
+        },
+        "budgetFirstMonthBehavior": {
+          "type": "string",
+          "example": "startNowFullAmount",
+          "description": "First month behavior of monthly budget campaign. Defaults to `startNextMonthFullAmount`.",
+          "enum": [
+            "startNowProratedAmount",
+            "startNowFullAmount",
+            "startNextMonthFullAmount"
+          ]
+        },
+        "maxCpc": {
+          "type": "number",
+          "example": 100,
+          "description": "Required when budgetOptimizationTarget is bidForClicks. If budgetOptimizationTarget is automatic, maxCpc is automatically calculated. Do not set this."
+        },
+        "budgetOnetimeDuration": {
+          "type": "integer",
+          "format": "int32",
+          "example": 10,
+          "description": "The duration of one time budget ads. Required when the `budgetOptimizationTarget` is automatic and the `budgetOnetimeLimit` is set."
+        }
+      }
+    }
+  }
+}
