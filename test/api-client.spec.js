@@ -1,5 +1,6 @@
 /* global describe, it, beforeEach, afterEach */
 const path = require('path')
+const fs = require('fs')
 const assert = require('power-assert')
 const sinon = require('sinon')
 
@@ -24,9 +25,18 @@ describe('ApiClient', () => {
     client = new ApiClient(oauth, { specPath: localDummyClientSpec() })
   })
 
+  /**
+   * @param {string} name
+   * @param {object} data
+   */
+  function writeFile (name, data) {
+    const dest = path.join(__dirname, `support/${name}.json`)
+    fs.writeFileSync(dest, data)
+  }
+
   describe.skip('fetch indeed', () => {
     beforeEach(() => {
-      jest.setTimeout = 10000 // eslint-disable-line
+      jest.setTimeout(10000) // eslint-disable-line
     })
 
     it('', async () => {
