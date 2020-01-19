@@ -11,7 +11,6 @@ class OAuthTokenStoreBase {
   get keys () {
     return [
       'access_token',
-      'refresh_token',
       'expires_in'
     ]
   }
@@ -25,10 +24,6 @@ class OAuthTokenStoreBase {
   }
 
   access_token () {
-    throw new NotImplemented()
-  }
-
-  refresh_token () {
     throw new NotImplemented()
   }
 }

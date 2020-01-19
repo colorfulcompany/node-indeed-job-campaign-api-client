@@ -4,14 +4,7 @@ const fs = require('fs')
 const moment = require('moment')
 
 /*
-
-OAuth Token Store as Plain Text File
-
-!! WARNING !!
-
-It's very danger storing refresh_token as plain text.
-USE FOR ONLY DEVELOPMENT ENVIRONMENT.
-
+ * OAuth Token Store as Plain File
  */
 class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
   /**
@@ -32,10 +25,11 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
    * @return {void}
    */
   renew (tokens, updatedAt = moment()) {
-    const data = {
-      ...tokens,
-      updatedAt
-    }
+    const data = { updatedAt }
+    this.keys.forEach((key) => {
+      data[key] = tokens[key]
+    })
+
     fs.writeFileSync(this.path, JSON.stringify(data))
   }
 
@@ -52,17 +46,6 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
           m() < m.utc(m.utc(updatedAt) + m.unix(props.expires_in))) {
         return props.access_token
       }
-    }
-  }
-
-  /**
-   * @return {string|undefined}
-   */
-  get refresh_token () {
-    const props = this.load()
-
-    if (props && typeof props.refresh_token !== 'undefined') {
-      return props.refresh_token
     }
   }
 

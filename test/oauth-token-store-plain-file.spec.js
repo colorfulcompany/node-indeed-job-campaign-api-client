@@ -75,6 +75,13 @@ describe('OAuthTokenStorePlainFile', () => {
         assert(updatedAt < store.updatedAt)
       })
     })
+    describe('given refresh_token', () => {
+      beforeEach(() => { store.renew(tokenInfos()) })
+
+      it('should be ignored', () => {
+        assert.equal(Object.keys(store.load()).indexOf('refresh_token'), -1)
+      })
+    })
   })
 
   describe('#access_token()', () => {
@@ -102,40 +109,6 @@ describe('OAuthTokenStorePlainFile', () => {
       })
       it('return undefined', async () => {
         assert.equal(store.access_token, undefined)
-      })
-    })
-  })
-
-  describe('#refresh_token()', () => {
-    describe('before renew', () => {
-      it('return undefined', () => {
-        assert.equal(store.refresh_token, undefined)
-      })
-    })
-
-    describe('after renew', () => {
-      beforeEach(() => {
-        store.renew(tokenInfos({ expires_in: 50 }))
-      })
-
-      describe('before expired', () => {
-        it('return string', () => {
-          assert.equal(typeof store.refresh_token, 'string')
-        })
-      })
-
-      describe('after 50ms expired', () => {
-        it('return string', async () => {
-          await sleep(100)
-          assert.equal(typeof store.refresh_token, 'string')
-        })
-      })
-
-      describe('after clear', () => {
-        it('return refresh', () => {
-          store.clear()
-          assert.equal(store.refresh_token, undefined)
-        })
       })
     })
   })
