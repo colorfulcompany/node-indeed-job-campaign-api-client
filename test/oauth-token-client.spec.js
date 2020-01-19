@@ -10,14 +10,14 @@ const assert = require('power-assert')
 const sinon = require('sinon')
 const moment = require('moment')
 
-const OAuthClient = require('oauth-client')
+const OAuthTokenClient = require('oauth-token-client')
 
-describe('OAuthClient', () => {
+describe('OAuthTokenClient', () => {
   var client
 
   describe.skip('fetch indeed', () => {
     it('', async () => {
-      client = new OAuthClient({
+      client = new OAuthTokenClient({
         client_id: '',
         secret: '',
         redirect_uri: '',
@@ -33,7 +33,7 @@ describe('OAuthClient', () => {
 
   describe('with mock', () => {
     beforeEach(() => {
-      client = new OAuthClient({ client_id: '', secret: '', redirect_uri: '' })
+      client = new OAuthTokenClient({ client_id: '', secret: '', redirect_uri: '' })
     })
 
     describe('#setRedirectUri', () => {

@@ -4,7 +4,7 @@ const fs = require('fs')
 const assert = require('power-assert')
 const sinon = require('sinon')
 
-const OAuthClient = require('oauth-client')
+const OAuthTokenClient = require('oauth-token-client')
 const ApiClient = require('api-client')
 
 const {
@@ -17,7 +17,7 @@ describe('ApiClient', () => {
   var client, oauth
 
   beforeEach(async () => {
-    oauth = new OAuthClient({
+    oauth = new OAuthTokenClient({
       ...oauthClientOpts(),
       redirect_uri: 'http://localhost:4321',
       expires_in: 3600
@@ -29,7 +29,7 @@ describe('ApiClient', () => {
    * @param {string} name
    * @param {object} data
    */
-  function writeFile (name, data) {
+  function writeFile (name, data) { // eslint-disable-line no-unused-vars
     const dest = path.join(__dirname, `support/${name}.json`)
     fs.writeFileSync(dest, data)
   }
@@ -41,7 +41,7 @@ describe('ApiClient', () => {
 
     it('', async () => {
       // overwrite for production
-      client = new ApiClient(oauth) //,{ specPath: productionClientSpec() })
+      client = new ApiClient(oauth) // ,{ specPath: productionClientSpec() })
       console.log(await client.apis())
       console.log(await client.employer())
     })

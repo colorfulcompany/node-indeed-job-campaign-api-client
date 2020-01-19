@@ -7,7 +7,7 @@
 const OAuth2 = require('oauth').OAuth2
 const moment = require('moment')
 
-class OAuthClient {
+class OAuthTokenClient {
   /**
    * @param {object} config
    */
@@ -207,4 +207,4 @@ redirect_uri
   }
 }
 
-module.exports = OAuthClient
+module.exports = OAuthTokenClient
