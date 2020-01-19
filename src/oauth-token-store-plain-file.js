@@ -1,4 +1,4 @@
-/* eslint camelcase: ['error', {allow: ['[a-z]*_token']}] */
+/* eslint camelcase: ['error', {allow: ['[a-z]*_token', 'token_type']}] */
 const OAuthTokenStoreBase = require('./oauth-token-store-base')
 const fs = require('fs')
 const moment = require('moment')
@@ -47,6 +47,15 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
         return props.access_token
       }
     }
+  }
+
+  /**
+   * @return {string|undefined}
+   */
+  get token_type () {
+    const props = this.load()
+
+    if (props && typeof props.token_type !== 'undefined') return props.token_type
   }
 
   /**
