@@ -1,4 +1,5 @@
 /* eslint camelcase: ['error', {allow: ['[a-z]*_token',
+                                        'client_*',
                                         'expires_in',
                                         'token_type',
                                         'grant_type',
@@ -9,35 +10,62 @@ const moment = require('moment')
 
 class OAuthTokenClient {
   /**
+   * @param {object} store
    * @param {object} config
    */
-  constructor (config = {}) {
-    this._tokenInfo = {}
+  constructor (store = {}, config = {}) {
+    this._store = store
+
+    this._refresh_token = undefined
     this._redirect_uri = undefined
+    this.setRedirectUri(config.redirect_uri)
+
     this._tokenWillExpiredAt = undefined
 
-    this.setRedirectUri(config.redirect_uri)
-    if (typeof config.expires_in === 'undefined') {
-      config.expires_in = 3600
+    const opts = {
+      ...this.defaultConfig,
+      ...config
     }
-    if (Object.keys(config).length > 0) {
-      this.setTokens(config)
-    }
+    this.setTokens(opts)
 
     this.oauth = new OAuth2(
-      config.client_id,
-      config.client_secret,
-      config.baseSite || this.baseSite(),
-      config.authorizePath || '/account/oauth',
-      config.accessTokenPath || '/oauth/tokens'
+      opts.client_id,
+      opts.client_secret,
+      opts.baseSite,
+      opts.authorizePath,
+      opts.accessTokenPath
     )
   }
 
   /**
-   * @return {string}
+   * @return {object}
    */
-  baseSite () {
-    return 'https://secure.indeed.com'
+  get store () {
+    return this._store
+  }
+
+  /**
+   * @return {object}
+   */
+  get defaultConfig () {
+    return {
+      client_id: process.env.INDEED_CLIENT_ID,
+      client_secret: process.env.INDEED_CLIENT_SECRET,
+      access_token: process.env.INDEED_ACCESS_TOKEN,
+      refresh_token: process.env.INDEED_REFRESH_TOKEN,
+      redirect_uri: process.env.INDEED_REDIRECT_URI || 'http://localhost:4321', // required in Indeed Auth API,
+      expires_in: 3600,
+      baseSite: 'https://secure.indeed.com',
+      authorizePath: '/account/oauth',
+      accessTokenPath: '/oauth/tokens'
+    }
+  }
+
+  /**
+   * @return {string|undefined}
+   */
+  get refresh_token () {
+    return this._refresh_token
   }
 
   /**
@@ -106,59 +134,35 @@ redirect_uri
 
   /**
    * @param {object} config
-   * @return {object|boolean}
+   * @return {undefined}
    */
   setTokens (config) {
     const tokens = { token_type: this.defaultTokenType, ...config }
 
-    var tokenInfo = {}
+    const tokenInfo = {}
     const receivingKeys = this.tokenKeysWillReceive()
 
     receivingKeys.forEach((key) => {
       if (typeof tokens[key] !== 'undefined') {
+        if (key === 'refresh_token') this._refresh_token = tokens[key]
         tokenInfo[key] = tokens[key]
       }
     })
-
-    if (receivingKeys.length === Object.keys(tokenInfo).length) {
-      this._tokenInfo = tokenInfo
-      this.setTokenExpiresIn(tokenInfo.expires_in)
-
-      return tokenInfo
-    } else {
-      return false
-    }
+    this.store.renew(tokenInfo)
   }
 
   /**
-   * @param {number} expires_in
-   * @return {moment|boolean}
+   * @return {boolean}
    */
-  setTokenExpiresIn (expires_in) {
-    if (typeof expires_in !== 'number' || Number.isNaN(expires_in)) {
-      return false
-    } else {
-      const expiredAt = this.now().add(expires_in, 'seconds')
-      this._tokenWillExpiredAt = expiredAt
-
-      return expiredAt
-    }
-  }
-
-  /**
-   * @return {object}
-   */
-  tokenWillExpiredAt () {
-    return this._tokenWillExpiredAt
+  isTokenEmpty () {
+    return !this.access_token
   }
 
   /**
    * @return {boolean}
    */
   isTokenExpired () {
-    const willExpiredAt = this.tokenWillExpiredAt()
-
-    return (willExpiredAt) ? this.now() > willExpiredAt : true
+    return this.store.updatedAt && !this.store.access_token
   }
 
   /**
@@ -166,13 +170,13 @@ redirect_uri
    */
   async accessToken () {
     // need retry ?
-    if (this.isTokenExpired()) {
+    if (this.isTokenEmpty() || this.isTokenExpired()) {
       await this.sendRefreshToken()
     }
 
     return {
-      token_type: this.tokenInfo.token_type,
-      access_token: this.tokenInfo.access_token
+      token_type: this.store.token_type(),
+      access_token: this.store.access_token()
     }
   }
 
@@ -189,7 +193,7 @@ redirect_uri
   async sendRefreshToken () {
     return new Promise((resolve, reject) => {
       try {
-        const RT = this.tokenInfo.refresh_token
+        const RT = this.refresh_token
 
         this.oauth.getOAuthAccessToken(
           RT,
@@ -198,8 +202,8 @@ redirect_uri
             if (err) {
               return reject(err)
             } else {
-              const r = this.setTokens({ refresh_token: RT, ...results })
-              r ? resolve(r) : reject(r)
+              this.setTokens({ refresh_token: RT, ...results })
+              resolve(results)
             }
           }
         )

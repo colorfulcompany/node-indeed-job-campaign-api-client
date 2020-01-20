@@ -89,7 +89,7 @@ describe('OAuthTokenStorePlainFile', () => {
   describe('#access_token()', () => {
     describe('before renew', () => {
       it('return undefined', () => {
-        assert.equal(store.access_token, undefined)
+        assert.equal(store.access_token(), undefined)
       })
     })
 
@@ -98,7 +98,7 @@ describe('OAuthTokenStorePlainFile', () => {
         store.renew(tokenInfos())
       })
       it('can fetch access_token', () => {
-        assert(store.access_token)
+        assert(store.access_token())
       })
     })
 
@@ -110,7 +110,7 @@ describe('OAuthTokenStorePlainFile', () => {
         await sleep(50)
       })
       it('return undefined', async () => {
-        assert.equal(store.access_token, undefined)
+        assert.equal(store.access_token(), undefined)
       })
     })
   })

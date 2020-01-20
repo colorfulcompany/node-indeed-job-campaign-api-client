@@ -36,7 +36,7 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
   /**
    * @return {string|undefined}
    */
-  get access_token () {
+  access_token () {
     const props = this.load()
     const updatedAt = this.updatedAt
     const m = moment
@@ -52,7 +52,7 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
   /**
    * @return {string|undefined}
    */
-  get token_type () {
+  token_type () {
     const props = this.load()
 
     if (props && typeof props.token_type !== 'undefined') return props.token_type
