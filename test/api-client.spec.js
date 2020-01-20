@@ -4,25 +4,35 @@ const fs = require('fs')
 const assert = require('power-assert')
 const sinon = require('sinon')
 
+const OAuth2MockServerController = require('./support/oauth2-mock-server-controller')
+const OAuthTokenStoreDumb = require('oauth-token-store-dumb')
+
+const OAuthTokenStorePlainFile = require('oauth-token-store-plain-file')
+
 const OAuthTokenClient = require('oauth-token-client')
 const ApiClient = require('api-client')
 
 const {
-  oauthClientOpts,
+  oauthClientOpts, // eslint-disable-line
   localDummyClientSpec, // eslint-disable-line
-  productionClientSpec // eslint-disable-line
+  productionClientSpec, // eslint-disable-line
+  createOAuthClient
 } = require(path.join(__dirname, 'support/util'))
 
 describe('ApiClient', () => {
-  var client, oauth
+  var mockController, client, oauth
+
+  before(async () => { // eslint-disable-line no-undef
+    mockController = new OAuth2MockServerController()
+    await mockController.start()
+  })
+  after(async () => { // eslint-disable-line no-undef
+    await mockController.stop()
+  })
 
   beforeEach(async () => {
-    oauth = new OAuthTokenClient({
-      ...oauthClientOpts(),
-      redirect_uri: 'http://localhost:4321',
-      expires_in: 3600
-    })
-    client = new ApiClient(oauth, { specPath: localDummyClientSpec() })
+    oauth = createOAuthClient(new OAuthTokenStoreDumb(), mockController.host, mockController.port)
+    client = await ApiClient.create(oauth, { specPath: localDummyClientSpec() })
   })
 
   /**
@@ -34,14 +44,15 @@ describe('ApiClient', () => {
     fs.writeFileSync(dest, data)
   }
 
-  describe.skip('fetch indeed', () => {
-    beforeEach(() => {
-      jest.setTimeout(10000) // eslint-disable-line
+  describe.skip('fetch indeed', function () {
+    this.timeout(10000)
+
+    beforeEach(async () => {
+      oauth = new OAuthTokenClient(new OAuthTokenStorePlainFile(path.join(__dirname, '../tmp/token-store.json')))
     })
 
     it('', async () => {
-      // overwrite for production
-      client = new ApiClient(oauth) // ,{ specPath: productionClientSpec() })
+      client = await ApiClient.create(oauth) // ,{ specPath: productionClientSpec() })
       console.log(await client.apis())
       console.log(await client.employer())
     })
