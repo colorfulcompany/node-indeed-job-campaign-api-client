@@ -9,11 +9,99 @@
 const assert = require('power-assert')
 const sinon = require('sinon')
 const moment = require('moment')
+const { OAuth2Server } = require('oauth2-mock-server')
+
+const ky = require('ky-universal')
 
 const OAuthTokenClient = require('oauth-token-client')
 
 describe('OAuthTokenClient', () => {
+  const serverPort = 9876
+  const serverHost = 'localhost'
   var client
+
+  describe('with mock server', () => {
+    let server
+
+    /**
+     * @param {object} server
+     * @return {void}
+     */
+    function mockResponseRefreshTokenSuccessfully (server) {
+      server.service.once('beforeResponse', (tokenEndpointResponse) => {
+        // copied from Indeed Autentication document
+        // https://opensource.indeedeng.io/api-documentation/docs/campaigns/auth/#refresh-token
+        tokenEndpointResponse.body = {
+          access_token: 'FNEDvUYcL8o',
+          convid: '1c1a1s8540kkt89p',
+          scope: ['all'],
+          token_type: 'Bearer',
+          expires_in: 3600
+        }
+      })
+    }
+
+    /**
+     * @return {object}
+     */
+    function queryAsRefreshToken () {
+      const search = new URLSearchParams()
+      search.set('refresh_token', 'dfghj')
+      search.set('client_id', 'dfghjk')
+      search.set('client_secret', 'ghjkl')
+      search.set('redirect_uri', encodeURIComponent('http://localhost:3000'))
+      search.set('grant_type', 'refresh_token')
+
+      return search
+    }
+
+    before(async () => { // eslint-disable-line no-undef
+      server = new OAuth2Server()
+      await server.issuer.keys.generateRSA()
+      await server.start(serverPort, serverHost)
+    })
+
+    after(async () => { // eslint-disable-line no-undef
+      await server.stop()
+    })
+
+    describe('refresh token ', () => {
+      describe('just request with ky and response from mock server', () => {
+        /**
+         * @return {object} - JSON.parsed ky response
+         */
+        async function validRefreshRequestWithKy (body) {
+          return ky.post(
+            `http://${serverHost}:${serverPort}/token`,
+            {
+              body,
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Accept: 'application/json'
+              }
+            }
+          )
+            .json()
+        }
+
+        describe('refresh_token request successfully', () => {
+          beforeEach(() => {
+            mockResponseRefreshTokenSuccessfully(server)
+          })
+
+          it('fetch token successfully with ky', async () => {
+            const tokens = await validRefreshRequestWithKy(queryAsRefreshToken())
+            const responseKeys = Object.keys(tokens)
+            assert(
+              ['access_token', 'convid', 'token_type'].every((key) => {
+                return responseKeys.indexOf(key) >= 0
+              })
+            )
+          })
+        })
+      })
+    })
+  })
 
   describe.skip('fetch indeed', () => {
     it('', async () => {
@@ -31,7 +119,7 @@ describe('OAuthTokenClient', () => {
     })
   })
 
-  describe('with mock', () => {
+  describe.skip('with sinon mock', () => {
     beforeEach(() => {
       client = new OAuthTokenClient({ client_id: '', secret: '', redirect_uri: '' })
     })
