@@ -10,11 +10,13 @@ const moment = require('moment')
 
 class OAuthTokenClient {
   /**
+   * @param {object} store
    * @param {object} config
    */
-  constructor (config = {}) {
-    this._tokenInfo = {}
+  constructor (store = {}, config = {}) {
+    this._store = store
 
+    this._refresh_token = undefined
     this._redirect_uri = undefined
     this.setRedirectUri(config.redirect_uri)
 
@@ -38,6 +40,13 @@ class OAuthTokenClient {
   /**
    * @return {object}
    */
+  get store () {
+    return this._store
+  }
+
+  /**
+   * @return {object}
+   */
   get defaultConfig () {
     return {
       client_id: process.env.INDEED_CLIENT_ID,
@@ -50,6 +59,13 @@ class OAuthTokenClient {
       authorizePath: '/account/oauth',
       accessTokenPath: '/oauth/tokens'
     }
+  }
+
+  /**
+   * @return {string|undefined}
+   */
+  get refresh_token () {
+    return this._refresh_token
   }
 
   /**
@@ -118,59 +134,28 @@ redirect_uri
 
   /**
    * @param {object} config
-   * @return {object|boolean}
+   * @return {undefined}
    */
   setTokens (config) {
     const tokens = { token_type: this.defaultTokenType, ...config }
 
-    var tokenInfo = {}
+    const tokenInfo = {}
     const receivingKeys = this.tokenKeysWillReceive()
 
     receivingKeys.forEach((key) => {
       if (typeof tokens[key] !== 'undefined') {
+        if (key === 'refresh_token') this._refresh_token = tokens[key]
         tokenInfo[key] = tokens[key]
       }
     })
-
-    if (receivingKeys.length === Object.keys(tokenInfo).length) {
-      this._tokenInfo = tokenInfo
-      this.setTokenExpiresIn(tokenInfo.expires_in)
-
-      return tokenInfo
-    } else {
-      return false
-    }
-  }
-
-  /**
-   * @param {number} expires_in
-   * @return {moment|boolean}
-   */
-  setTokenExpiresIn (expires_in) {
-    if (typeof expires_in !== 'number' || Number.isNaN(expires_in)) {
-      return false
-    } else {
-      const expiredAt = this.now().add(expires_in, 'seconds')
-      this._tokenWillExpiredAt = expiredAt
-
-      return expiredAt
-    }
-  }
-
-  /**
-   * @return {object}
-   */
-  tokenWillExpiredAt () {
-    return this._tokenWillExpiredAt
+    this.store.renew(tokenInfo)
   }
 
   /**
    * @return {boolean}
    */
   isTokenExpired () {
-    const willExpiredAt = this.tokenWillExpiredAt()
-
-    return (willExpiredAt) ? this.now() > willExpiredAt : true
+    return this.store.updatedAt && !this.store.access_token
   }
 
   /**
@@ -183,8 +168,8 @@ redirect_uri
     }
 
     return {
-      token_type: this.tokenInfo.token_type,
-      access_token: this.tokenInfo.access_token
+      token_type: this.store.token_type,
+      access_token: this.store.access_token
     }
   }
 
@@ -201,7 +186,7 @@ redirect_uri
   async sendRefreshToken () {
     return new Promise((resolve, reject) => {
       try {
-        const RT = this.tokenInfo.refresh_token
+        const RT = this.refresh_token
 
         this.oauth.getOAuthAccessToken(
           RT,
@@ -210,8 +195,8 @@ redirect_uri
             if (err) {
               return reject(err)
             } else {
-              const r = this.setTokens({ refresh_token: RT, ...results })
-              r ? resolve(r) : reject(r)
+              this.setTokens({ refresh_token: RT, ...results })
+              resolve(results)
             }
           }
         )

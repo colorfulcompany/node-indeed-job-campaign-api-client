@@ -15,6 +15,11 @@ const ky = require('ky-universal')
 const { mockResponseRefreshTokenSuccessfully } = require('./support/util')
 
 const OAuthTokenClient = require('oauth-token-client')
+const OAuthTokenStoreDumb = require('oauth-token-store-dumb')
+
+class TestingOAuthTokenStore extends OAuthTokenStoreDumb {
+  access_token () { return 'ELky5zO_iUZuf' }
+}
 
 describe('OAuthTokenClient', () => {
   const serverPort = 9876
@@ -109,6 +114,7 @@ describe('OAuthTokenClient', () => {
 
         it('receive tokens but except convid', async () => {
           client = new OAuthTokenClient(
+            new TestingOAuthTokenStore(),
             {
               ...paramForRefreshingToken(),
               baseSite: `http://${serverHost}:${serverPort}`,
@@ -118,7 +124,7 @@ describe('OAuthTokenClient', () => {
           const tokens = await client.sendRefreshToken()
           const responseKeys = Object.keys(tokens)
           assert(
-            ['access_token', 'refresh_token', 'expires_in', 'token_type'].every((key) => responseKeys.indexOf(key) >= 0)
+            ['access_token', 'expires_in', 'token_type'].every((key) => responseKeys.indexOf(key) >= 0)
           )
         })
       })
