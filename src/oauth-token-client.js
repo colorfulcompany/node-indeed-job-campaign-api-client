@@ -1,4 +1,5 @@
 /* eslint camelcase: ['error', {allow: ['[a-z]*_token',
+                                        'client_*',
                                         'expires_in',
                                         'token_type',
                                         'grant_type',
@@ -13,31 +14,42 @@ class OAuthTokenClient {
    */
   constructor (config = {}) {
     this._tokenInfo = {}
+
     this._redirect_uri = undefined
+    this.setRedirectUri(config.redirect_uri)
+
     this._tokenWillExpiredAt = undefined
 
-    this.setRedirectUri(config.redirect_uri)
-    if (typeof config.expires_in === 'undefined') {
-      config.expires_in = 3600
+    const opts = {
+      ...this.defaultConfig,
+      ...config
     }
-    if (Object.keys(config).length > 0) {
-      this.setTokens(config)
-    }
+    this.setTokens(opts)
 
     this.oauth = new OAuth2(
-      config.client_id,
-      config.client_secret,
-      config.baseSite || this.baseSite(),
-      config.authorizePath || '/account/oauth',
-      config.accessTokenPath || '/oauth/tokens'
+      opts.client_id,
+      opts.client_secret,
+      opts.baseSite,
+      opts.authorizePath,
+      opts.accessTokenPath
     )
   }
 
   /**
-   * @return {string}
+   * @return {object}
    */
-  baseSite () {
-    return 'https://secure.indeed.com'
+  get defaultConfig () {
+    return {
+      client_id: process.env.INDEED_CLIENT_ID,
+      client_secret: process.env.INDEED_CLIENT_SECRET,
+      access_token: process.env.INDEED_ACCESS_TOKEN,
+      refresh_token: process.env.INDEED_REFRESH_TOKEN,
+      redirect_uri: process.env.INDEED_REDIRECT_URI || 'http://localhost:4321', // required in Indeed Auth API,
+      expires_in: 3600,
+      baseSite: 'https://secure.indeed.com',
+      authorizePath: '/account/oauth',
+      accessTokenPath: '/oauth/tokens'
+    }
   }
 
   /**
