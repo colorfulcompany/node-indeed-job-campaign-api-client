@@ -154,6 +154,13 @@ redirect_uri
   /**
    * @return {boolean}
    */
+  isTokenEmpty () {
+    return !this.access_token
+  }
+
+  /**
+   * @return {boolean}
+   */
   isTokenExpired () {
     return this.store.updatedAt && !this.store.access_token
   }
@@ -163,13 +170,13 @@ redirect_uri
    */
   async accessToken () {
     // need retry ?
-    if (this.isTokenExpired()) {
+    if (this.isTokenEmpty() || this.isTokenExpired()) {
       await this.sendRefreshToken()
     }
 
     return {
-      token_type: this.store.token_type,
-      access_token: this.store.access_token
+      token_type: this.store.token_type(),
+      access_token: this.store.access_token()
     }
   }
 
