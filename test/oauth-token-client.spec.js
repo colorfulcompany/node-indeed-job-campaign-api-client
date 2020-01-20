@@ -4,7 +4,7 @@
                                         'token_type',
                                         'grant_type',
                                         'redirect_uri',
-                                        'client_id']}] */
+                                        'client_*']}] */
 
 const assert = require('power-assert')
 const sinon = require('sinon')
@@ -12,6 +12,7 @@ const moment = require('moment')
 const { OAuth2Server } = require('oauth2-mock-server')
 
 const ky = require('ky-universal')
+const { mockResponseRefreshTokenSuccessfully } = require('./support/util')
 
 const OAuthTokenClient = require('oauth-token-client')
 
@@ -24,21 +25,17 @@ describe('OAuthTokenClient', () => {
     let server
 
     /**
-     * @param {object} server
-     * @return {void}
+     * @return {object}
      */
-    function mockResponseRefreshTokenSuccessfully (server) {
-      server.service.once('beforeResponse', (tokenEndpointResponse) => {
-        // copied from Indeed Autentication document
-        // https://opensource.indeedeng.io/api-documentation/docs/campaigns/auth/#refresh-token
-        tokenEndpointResponse.body = {
-          access_token: 'FNEDvUYcL8o',
-          convid: '1c1a1s8540kkt89p',
-          scope: ['all'],
-          token_type: 'Bearer',
-          expires_in: 3600
-        }
-      })
+    function paramForRefreshingToken () {
+      return {
+        client_id: 'y2w0i2pbsimq9hnaeu4hbbbi56axim88w458uxeb',
+        client_secret: 'w7bf4x0twmigpw0t6mi8la9gel2iyj6dzridhzll',
+        access_token: 'ELky5zO_iUZuf',
+        refresh_token: 'YzecKCk5ApJgO',
+        redirect_uri: 'http://localhost:4321',
+        grant_type: 'refresh_token'
+      }
     }
 
     /**
@@ -46,11 +43,14 @@ describe('OAuthTokenClient', () => {
      */
     function queryAsRefreshToken () {
       const search = new URLSearchParams()
-      search.set('refresh_token', 'dfghj')
-      search.set('client_id', 'dfghjk')
-      search.set('client_secret', 'ghjkl')
-      search.set('redirect_uri', encodeURIComponent('http://localhost:3000'))
-      search.set('grant_type', 'refresh_token')
+      const params = paramForRefreshingToken()
+      for (const key in params) {
+        if (key === 'redirect_uri') {
+          search.set(key, encodeURIComponent(params[key]))
+        } else {
+          search.set(key, params[key])
+        }
+      }
 
       return search
     }
@@ -68,6 +68,7 @@ describe('OAuthTokenClient', () => {
     describe('refresh token ', () => {
       describe('just request with ky and response from mock server', () => {
         /**
+         * @param {object} body
          * @return {object} - JSON.parsed ky response
          */
         async function validRefreshRequestWithKy (body) {
