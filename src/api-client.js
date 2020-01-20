@@ -9,16 +9,35 @@ class ApiClient {
   constructor (oauth = {}, opts = {}) {
     this.oauth = oauth
     this.opts = opts
+    this.api = undefined
+  }
 
-    this.api = new Swagger({
-      spec: this.apiSpec
-    })
+  /**
+   * @param {object} oauth
+   * @param {object} opts
+   * @return {ApiClient}
+   */
+  static async create (oauth = {}, opts = {}) {
+    const client = new this(oauth, opts)
+
+    client.setSwagger(new Swagger({
+      spec: await client.resolveSpec()
+    }))
+
+    return client
+  }
+
+  /**
+   * @param {object} swagger
+   */
+  setSwagger (swagger) {
+    this.api = swagger
   }
 
   /**
    * @return {object}
    */
-  get apiSpec () {
+  async resolveSpec () {
     if (typeof this.opts.specPath !== 'undefined') {
       return require(this.opts.specPath)
     } else {
@@ -29,10 +48,8 @@ class ApiClient {
         url = 'https://opensource.indeedeng.io/api-documentation/docs/campaigns/api.json'
       }
 
-      return (async () => {
-        const res = await ky(url)
-        return res.json()
-      })()
+      const res = await ky(url)
+      return res.json()
     }
   }
 
