@@ -31,6 +31,10 @@ class OAuthTokenStoreBase {
   token_type () {
     throw new NotImplemented()
   }
+
+  get updatedAt () {
+    throw new NotImplemented()
+  }
 }
 
 module.exports = OAuthTokenStoreBase

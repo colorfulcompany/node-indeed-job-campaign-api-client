@@ -10,6 +10,8 @@ class OAuthTokenStoreDumb extends OAuthTokenStoreBase {
   access_token () { return '' }
 
   token_type () { return 'Bearer' }
+
+  get updatedAt () { return undefined }
 }
 
 module.exports = OAuthTokenStoreDumb
