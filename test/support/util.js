@@ -1,4 +1,5 @@
 const path = require('path')
+const OAuthTokenClient = require('oauth-token-client')
 
 /**
  * @return {object}
@@ -46,9 +47,42 @@ function mockResponseRefreshTokenSuccessfully (server) {
   })
 }
 
+/**
+ * @return {object}
+ */
+function paramForRefreshingToken () {
+  return {
+    client_id: 'y2w0i2pbsimq9hnaeu4hbbbi56axim88w458uxeb',
+    client_secret: 'w7bf4x0twmigpw0t6mi8la9gel2iyj6dzridhzll',
+    access_token: 'ELky5zO_iUZuf',
+    refresh_token: 'YzecKCk5ApJgO',
+    redirect_uri: 'http://localhost:4321',
+    grant_type: 'refresh_token'
+  }
+}
+
+/**
+ * @param {object} store
+ * @param {string} host
+ * @param {number} port
+ * @return {object}
+ */
+function createOAuthClient (store, host, port) {
+  return new OAuthTokenClient(
+    store,
+    {
+      ...paramForRefreshingToken(),
+      baseSite: `http://${host}:${port}`,
+      authorizePath: '/authorize',
+      accessTokenPath: '/token'
+    })
+}
+
 module.exports = {
   oauthClientOpts,
   localDummyClientSpec,
   productionClientSpec,
-  mockResponseRefreshTokenSuccessfully
+  mockResponseRefreshTokenSuccessfully,
+  paramForRefreshingToken,
+  createOAuthClient
 }

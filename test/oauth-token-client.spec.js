@@ -9,12 +9,16 @@
 const assert = require('power-assert')
 const sinon = require('sinon')
 const moment = require('moment')
-const { OAuth2Server } = require('oauth2-mock-server')
 
 const ky = require('ky-universal')
-const { mockResponseRefreshTokenSuccessfully } = require('./support/util')
-
+const {
+  mockResponseRefreshTokenSuccessfully,
+  paramForRefreshingToken,
+  createOAuthClient
+} = require('./support/util')
 const OAuthTokenClient = require('oauth-token-client')
+const OAuth2MockServerController = require('./support/oauth2-mock-server-controller')
+
 const OAuthTokenStoreDumb = require('oauth-token-store-dumb')
 
 class TestingOAuthTokenStore extends OAuthTokenStoreDumb {
@@ -22,26 +26,10 @@ class TestingOAuthTokenStore extends OAuthTokenStoreDumb {
 }
 
 describe('OAuthTokenClient', () => {
-  const serverPort = 9876
-  const serverHost = 'localhost'
   var client
 
   describe('with mock server', () => {
-    let server
-
-    /**
-     * @return {object}
-     */
-    function paramForRefreshingToken () {
-      return {
-        client_id: 'y2w0i2pbsimq9hnaeu4hbbbi56axim88w458uxeb',
-        client_secret: 'w7bf4x0twmigpw0t6mi8la9gel2iyj6dzridhzll',
-        access_token: 'ELky5zO_iUZuf',
-        refresh_token: 'YzecKCk5ApJgO',
-        redirect_uri: 'http://localhost:4321',
-        grant_type: 'refresh_token'
-      }
-    }
+    let mockController
 
     /**
      * @return {object}
@@ -61,13 +49,11 @@ describe('OAuthTokenClient', () => {
     }
 
     before(async () => { // eslint-disable-line no-undef
-      server = new OAuth2Server()
-      await server.issuer.keys.generateRSA()
-      await server.start(serverPort, serverHost)
+      mockController = new OAuth2MockServerController()
+      await mockController.start()
     })
-
     after(async () => { // eslint-disable-line no-undef
-      await server.stop()
+      await mockController.stop()
     })
 
     describe('refresh token ', () => {
@@ -78,7 +64,7 @@ describe('OAuthTokenClient', () => {
          */
         async function validRefreshRequestWithKy (body) {
           return ky.post(
-            `http://${serverHost}:${serverPort}/token`,
+            `http://${mockController.host}:${mockController.port}/token`,
             {
               body,
               headers: {
@@ -92,7 +78,7 @@ describe('OAuthTokenClient', () => {
 
         describe('refresh_token request successfully', () => {
           beforeEach(() => {
-            mockResponseRefreshTokenSuccessfully(server)
+            mockResponseRefreshTokenSuccessfully(mockController.server)
           })
 
           it('fetch token successfully with ky', async () => {
@@ -109,18 +95,11 @@ describe('OAuthTokenClient', () => {
 
       describe('refresh with OAuthTokenClient', () => {
         beforeEach(() => {
-          mockResponseRefreshTokenSuccessfully(server)
+          mockResponseRefreshTokenSuccessfully(mockController.server)
         })
 
         it('receive tokens but except convid', async () => {
-          client = new OAuthTokenClient(
-            new TestingOAuthTokenStore(),
-            {
-              ...paramForRefreshingToken(),
-              baseSite: `http://${serverHost}:${serverPort}`,
-              authorizePath: '/authorize',
-              accessTokenPath: '/token'
-            })
+          client = createOAuthClient(new TestingOAuthTokenStore(), mockController.host, mockController.port)
           const tokens = await client.sendRefreshToken()
           const responseKeys = Object.keys(tokens)
           assert(
