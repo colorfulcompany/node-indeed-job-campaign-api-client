@@ -17,16 +17,19 @@ class OAuthTokenClient {
     this._tokenWillExpiredAt = undefined
 
     this.setRedirectUri(config.redirect_uri)
+    if (typeof config.expires_in === 'undefined') {
+      config.expires_in = 3600
+    }
     if (Object.keys(config).length > 0) {
       this.setTokens(config)
     }
 
     this.oauth = new OAuth2(
       config.client_id,
-      config.secret,
-      this.baseSite(),
-      '/account/oauth',
-      '/oauth/tokens'
+      config.client_secret,
+      config.baseSite || this.baseSite(),
+      config.authorizePath || '/account/oauth',
+      config.accessTokenPath || '/oauth/tokens'
     )
   }
 

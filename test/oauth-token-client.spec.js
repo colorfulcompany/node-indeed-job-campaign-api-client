@@ -101,6 +101,27 @@ describe('OAuthTokenClient', () => {
           })
         })
       })
+
+      describe('refresh with OAuthTokenClient', () => {
+        beforeEach(() => {
+          mockResponseRefreshTokenSuccessfully(server)
+        })
+
+        it('receive tokens but except convid', async () => {
+          client = new OAuthTokenClient(
+            {
+              ...paramForRefreshingToken(),
+              baseSite: `http://${serverHost}:${serverPort}`,
+              authorizePath: '/authorize',
+              accessTokenPath: '/token'
+            })
+          const tokens = await client.sendRefreshToken()
+          const responseKeys = Object.keys(tokens)
+          assert(
+            ['access_token', 'refresh_token', 'expires_in', 'token_type'].every((key) => responseKeys.indexOf(key) >= 0)
+          )
+        })
+      })
     })
   })
 
