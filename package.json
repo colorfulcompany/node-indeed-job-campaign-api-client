@@ -17,7 +17,7 @@
     "sleep-promise": "^8.0.1"
   },
   "dependencies": {
-    "ky": "^0.15.0",
+    "ky": "^0.16.2",
     "ky-universal": "^0.3.0",
     "moment": "^2.24.0",
     "oauth": "^0.9.15",
