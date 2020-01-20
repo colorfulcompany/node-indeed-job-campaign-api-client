@@ -12,12 +12,13 @@
     "intelli-espower-loader": "^1.0.1",
     "lint-staged": "^9.5.0",
     "mocha": "^7.0.0",
+    "oauth2-mock-server": "^1.4.0",
     "power-assert": "^1.6.1",
     "sinon": "^7.5.0",
     "sleep-promise": "^8.0.1"
   },
   "dependencies": {
-    "ky": "^0.15.0",
+    "ky": "^0.16.2",
     "ky-universal": "^0.3.0",
     "moment": "^2.24.0",
     "oauth": "^0.9.15",

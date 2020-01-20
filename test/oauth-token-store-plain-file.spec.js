@@ -1,5 +1,6 @@
 /* global describe, it, beforeEach */
 /* eslint camelcase: ['error', {allow: ['[a-z]*_token',
+                                        'token_type',
                                         'expires_in']}] */
 
 const path = require('path')
@@ -22,6 +23,7 @@ describe('OAuthTokenStorePlainFile', () => {
     return {
       access_token: 'qMzU-NFsxbf',
       refresh_token: 'DMLHvas77H3',
+      token_type: 'Bearer', // Indeed always response
       expires_in
     }
   }
