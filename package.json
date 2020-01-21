@@ -1,4 +1,8 @@
 {
+  "name": "indeed-job-campaign-api-client",
+  "version": "0.1.0",
+  "license": "BSD-2-Clause",
+  "main": "index.js",
   "devDependencies": {
     "eslint": "^6.5.1",
     "eslint-config-standard": "^14.1.0",
