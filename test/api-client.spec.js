@@ -52,7 +52,7 @@ describe('ApiClient', () => {
     })
 
     it('', async () => {
-      client = await ApiClient.create(oauth) // ,{ specPath: productionClientSpec() })
+      client = await ApiClient.create(oauth, {}) // force fetch spec from remote
       console.log(await client.apis())
       console.log(await client.employer())
     })

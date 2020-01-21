@@ -1,3 +1,4 @@
+const path = require('path')
 const Swagger = require('swagger-client')
 const ky = require('ky-universal')
 
@@ -17,7 +18,7 @@ class ApiClient {
    * @param {object} opts
    * @return {ApiClient}
    */
-  static async create (oauth = {}, opts = {}) {
+  static async create (oauth = {}, opts = { specPath: path.join(__dirname, '../spec/api.json') }) {
     const client = new this(oauth, opts)
 
     client.setSwagger(new Swagger({

@@ -26,7 +26,7 @@ function localDummyClientSpec () { // eslint-disable-line
 
 /** @return {string} */
 function productionClientSpec () { // eslint-disable-line
-  return path.join(__dirname, 'api.json')
+  return path.join(__dirname, '../../spec/api.json')
 }
 
 /**
