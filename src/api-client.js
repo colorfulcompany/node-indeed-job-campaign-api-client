@@ -2,6 +2,10 @@ const path = require('path')
 const Swagger = require('swagger-client')
 const ky = require('ky-universal')
 
+class ApiClientExecError extends Error {
+  get name () { return 'ApiClientExecError' }
+}
+
 class ApiClient {
   /**
    * @param {object} oauth
@@ -98,7 +102,10 @@ class ApiClient {
               this.exec(opts, retry).then(resolve).catch(reject)
             }, wait)
           } else {
-            return reject(e)
+            const err = new ApiClientExecError()
+            err.req = opts
+            err.swaggerError = e
+            return reject(err)
           }
         })
     })
