@@ -89,11 +89,19 @@ describe('ApiClient', () => {
         sinon.stub(client.oauth, 'sendRefreshToken').callsFake(() => {})
       })
 
+      it('ApiclientExecError', () => {
+        assert.rejects(
+          async () => client.exec({}),
+          { name: 'ApiClientExecError' }
+        )
+      })
+
       it('rejected and retried ', async () => {
         try {
           await client.exec({})
         } catch (e) {
-          assert.equal(e.status, 401)
+          assert.deepEqual(e.req, {})
+          assert.equal(e.swaggerError.status, 401)
           assert(spyIsUnthorized.called)
         }
         sinon.verify()
