@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Use this API to get information about and manage an Indeed employer's sponsored job campaigns.  <h2>Authentication</h2><p>To get API credentials, see <a href='http://opensource.indeedeng.io/api-documentation/docs/campaigns/auth/'>Authentication</a>.</p> <h2>Deprecated resources</h2> <p>If a resource in this document is marked <strong>deprecated</strong>, we advise you to update your integration and stop using it. Deprecated resources will no longer be available in the future. </p> <h2>Limited-release (beta) resources</h2> <p>If a resource in this document is marked <strong>limited-release (beta)</strong>, it is not available to all consumers of this API. The resource is available to particular API users by invitation only. </p> <h2>Rate limiting</h2><p>Indeed applies rate limiting to this API. This ensures system stability against unauthorized or unexpected use.</p> <h2>Contact Us</h2><p>For further questions, not answered in this document, send an email to <a href='mailto:ads-api@indeed.com'>ads-api@indeed.com</a>.</p>",
+    "description": "Use this API to get information about and manage an Indeed employer's sponsored job campaigns.  <h2>Authentication</h2><p>To get API credentials, see <a href='https://opensource.indeedeng.io/api-documentation/docs/campaigns/auth/'>Authentication</a>.</p> <h2>Deprecated resources</h2> <p>If a resource in this document is marked <strong>deprecated</strong>, we advise you to update your integration and stop using it. Deprecated resources will no longer be available in the future. </p> <h2>Limited-release (beta) resources</h2> <p>If a resource in this document is marked <strong>limited-release (beta)</strong>, it is not available to all consumers of this API. The resource is available to particular API users by invitation only. </p> <h2>Rate limiting</h2><p>Indeed applies rate limiting to this API. This ensures system stability against unauthorized or unexpected use.</p> <h2>Contact Us</h2><p>For further questions, not answered in this document, send an email to <a href='mailto:ads-api@indeed.com'>ads-api@indeed.com</a>.</p>",
     "version": "1.0.0",
     "title": "Sponsored Job Campaigns API"
   },
@@ -38,6 +38,13 @@
             "name": "advertiserId",
             "in": "query",
             "description": "(Optional) If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "(Optional) Indicates which fields to include in the response. Possible values are: <code>id</code>, <code>email</code>, <code>contact</code>, <code>company</code>, <code>jobSourceList</code>, and <code>billingActive</code>. If not specified, then the default is: <code>id,email,contact,company,jobSourceList</code>",
             "required": false,
             "type": "string"
           }
@@ -160,7 +167,7 @@
           "Account management"
         ],
         "summary": "Create a new advertiser subaccount",
-        "description": "<p>Create a new advertiser subaccount.<br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/>Not available for Individual Employers</p> <p><strong>Ad Agencies</strong><br/>If you represent multiple Indeed employers (have a master account), create a new subaccount associated with your account.</p>",
+        "description": "<p>Create a new advertiser subaccount.<br/>Specify the content type as <code>application/json</code> in your request.<br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/>Not available for Individual Employers</p> <p><strong>Ad Agencies</strong><br/>If you represent multiple Indeed employers (have a master account), create a new subaccount associated with your account.</p>",
         "operationId": "createSubaccount",
         "consumes": [
           "application/json"
@@ -170,32 +177,12 @@
         ],
         "parameters": [
           {
-            "name": "email",
-            "in": "query",
-            "description": "The email for the subaccount. Example: <code>subaccount@advertiser.com</code>",
+            "in": "body",
+            "name": "body",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "currencyCode",
-            "in": "query",
-            "description": "The 3-letter currency code used for the subaccount. Example: <code>USD</code>",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "language",
-            "in": "query",
-            "description": "The 2-letter language code used for the subaccount. Example: <code>en</code>",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "employeeCount",
-            "in": "query",
-            "description": "The number of employees. Possible values are: 1-49, 50-149, 150-249, 250-499, 500-749, 750-999, 1000+",
-            "required": true,
-            "type": "string"
+            "schema": {
+              "$ref": "#/definitions/subAccountBody"
+            }
           }
         ],
         "responses": {
@@ -611,7 +598,7 @@
           "Account management"
         ],
         "summary": "Update your monthly jobs budget",
-        "description": "<p>To update an employer's monthly jobs budget, pass a new numeric value for <code>jobsMonthlyBudget</code> in the request body. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/account/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>To update an employer's monthly jobs budget, pass a new numeric value for <code>jobsMonthlyBudget</code> in the request body.<br/>Specify the content type as <code>application/json</code> in your request.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/account/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "updateBudget",
         "produces": [
           "application/json"
@@ -1134,7 +1121,7 @@
           "Campaign management"
         ],
         "summary": "Creates a new campaign",
-        "description": "<p>Create a new sponsored job campaign. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>Create a new sponsored job campaign.<br/>Specify the content type as <code>application/json</code> in your request.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "createCampaign",
         "consumes": [
           "application/json"
@@ -1659,7 +1646,7 @@
           "Campaign management"
         ],
         "summary": "Update general campaign information",
-        "description": "<p>Update some general campaign information. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/Av16isrH7Q6odKYa?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>Update some general campaign information.<br/>Specify the content type as <code>application/json</code> in your request.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/Av16isrH7Q6odKYa?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "updateCampaign",
         "consumes": [
           "application/json"
@@ -2181,7 +2168,7 @@
           "Campaign management"
         ],
         "summary": "Update a campaign's budget information",
-        "description": "<p>Update a campaign's budget information. <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/cda7fa7645b613d5/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p> ",
+        "description": "<p>Update a campaign's budget information.<br/>Specify the content type as <code>application/json</code> in your request.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple employers (have a master account), pass an employer's Indeed <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/cda7fa7645b613d5/budget?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p> ",
         "operationId": "updateCampaignBudget",
         "consumes": [
           "application/json"
@@ -2937,7 +2924,7 @@
           "Reports"
         ],
         "summary": "Get campaign statistics for a date range or a list of campaign dates.",
-        "description": "<p>If you pass a date range using the <code>startDate</code> and <code>endDate</code> query parameters, this endpoint returns campaign statistics for that date range, similar to the <code>v1/campaigns/&lt;campaignId&gt;/stats/{date}</code> endpoint. If you pass a start date using the <code>start</code> parameter, you get a list of campaign entry dates.  <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.qa.indeed.net/api/v1/stats?startDate=2018-06-01&endDate=2018-06-02&v=2</pre>\n<p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>If you pass a date range using the <code>startDate</code> and <code>endDate</code> query parameters, this endpoint returns campaign statistics for that date range, similar to the <code>v1/campaigns/&lt;campaignId&gt;/stats/{date}</code> endpoint.<br/>If the <code>merge</code> parameter is set to false, then this endpoint returns individual campaign statistics for each day in the date range.<br/>If you pass a start date using the <code>start</code> parameter, you get a list of campaign entry dates.  <br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.qa.indeed.net/api/v1/stats?startDate=2018-06-01&endDate=2018-06-02&v=2</pre>\n<p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "showAdvertisementStatsRootPage",
         "produces": [
           "application/json"
@@ -2984,7 +2971,7 @@
             "name": "merge",
             "in": "query",
             "type": "boolean",
-            "description": "(Optional) Whether to merge the campaign statistic results. Possible values are <code>true</code> and <code>false</code>."
+            "description": "(Optional) Whether to merge the campaign statistic results. Possible values are <code>true</code> and <code>false</code>. The default is <code>false</code>."
           },
           {
             "name": "perPage",
@@ -3223,7 +3210,7 @@
           "Reports"
         ],
         "summary": "Get a campaign's traffic statistics for a particular date",
-        "description": "<p>Get a sponsored job's campaign traffic statistics for a particular date. <br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p> <p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/Av16isrH7Q6odKYa/stats/2019-02-25?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>Get a sponsored job's campaign traffic statistics for a particular date. An unsuccessful request returning HTTP status code <code>404 RESOURCE_NOT_FOUND</code> could indicate that there are no traffic statistics for that particular date.<br/>&nbsp;</p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p> <p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/campaigns/Av16isrH7Q6odKYa/stats/2019-02-25?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "showAdvertisementStatsEntryDateDetails",
         "produces": [
           "application/json"
@@ -3520,7 +3507,7 @@
           "Detailed reports (beta) (limited release)"
         ],
         "summary": "Request a detailed campaign traffic report for a specified date range.",
-        "description": "<p><strong>Note:</strong> This is a limited-release API. It is currently in Beta test status.<br/>&nbsp;</p><p>Use this resource to request a link to a detailed report. A successful request returns HTTP status code <code>202 ACCEPTED</code> and a <code>Location</code> header containing the path to the report. The report is in CSV format. The path to the report uses the <code>/v1/stats/{reportId}</code> resource. Refer to this resource for more information. </p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/stats?startDate=2019-02-25&endDate=2019-02-28&advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p><strong>Note:</strong> This is a limited-release API. It is currently in Beta test status.<br/>&nbsp;</p><p>Use this resource to request a link to a detailed report. You may query for only one day at a time.<br/>A successful request returns HTTP status code <code>202 ACCEPTED</code> and a <code>Location</code> header containing the path to the report. The report is in CSV format. The path to the report uses the <code>/v1/stats/{reportId}</code> resource. Refer to this resource for more information. </p> <p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:</p> <pre>https://employers.indeed.com/api/v1/stats?startDate=2019-02-25&endDate=2019-02-26&advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "requestTrafficStatsReport",
         "produces": [
           "application/json"
@@ -3537,7 +3524,7 @@
           {
             "name": "endDate",
             "in": "query",
-            "description": "The end date of the campaign traffic report, exclusive, in the format `YYYY-MM-DD`.",
+            "description": "The end date of the campaign traffic report, exclusive, in the format `YYYY-MM-DD`. This should be one day after the start date.",
             "required": true,
             "type": "string",
             "format": "date"
@@ -3639,7 +3626,7 @@
           "Hosted jobs (deprecated)"
         ],
         "summary": "Get the statuses of an employer’s jobs hosted on indeed.com",
-        "description": "<p>Get the statuses of an employer’s jobs hosted on <a href='http://www.indeed.com'>indeed.com</a>.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:<br/> <pre>https://employers.indeed.com/api/v1/hostedjobs?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "<p>Get the statuses of an employer’s jobs hosted on <a href='https://www.indeed.com'>indeed.com</a>.<br/>&nbsp;</p><p><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example:<br/> <pre>https://employers.indeed.com/api/v1/hostedjobs?advertiserId=acd7ac45363e5e14</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "getJobs",
         "produces": [
           "application/json"
@@ -3908,7 +3895,7 @@
           "Hosted jobs (deprecated)"
         ],
         "summary": "Get the details of a single job",
-        "description": "Get the details of an employer's jobs hosted on <a href='http://www.indeed.com'>indeed.com</a><br/><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example: <br/> <pre>`https://employers.indeed.com/api/v1/hostedjobs/9171a76ffcf3?advertiserId=acd7ac45363e5e14`</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
+        "description": "Get the details of an employer's jobs hosted on <a href='https://www.indeed.com'>indeed.com</a><br/><strong>Individual Employers</strong><br/> The <code>advertiserId</code> parameter is not required. </p><p><strong>Ad Agencies</strong><br/> If you represent multiple Indeed employers (have a master account), pass an employer's <code>advertiserId</code>. <br/>For example: <br/> <pre>`https://employers.indeed.com/api/v1/hostedjobs/9171a76ffcf3?advertiserId=acd7ac45363e5e14`</pre> <p>Use the <code>subaccounts</code> resource to get a complete list of your clients' advertiser IDs.</p>",
         "operationId": "getHostedJobsDetails",
         "produces": [
           "application/json"
@@ -4235,7 +4222,7 @@
         },
         "rootLocation": {
           "type": "string",
-          "example": "http://employers.indeed.com/api",
+          "example": "https://employers.indeed.com/api",
           "description": "The root URL of the relative paths in the response."
         },
         "perPage": {
@@ -4281,6 +4268,31 @@
         "email": {
           "example": "admin@indeed.com",
           "type": "string"
+        }
+      }
+    },
+    "subAccountBody": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "subaccount@advertiser.com",
+          "description": "The email for the subaccount."
+        },
+        "currencyCode": {
+          "type": "string",
+          "example": "USD",
+          "description": "The 3-letter currency code used for the subaccount."
+        },
+        "language": {
+          "type": "string",
+          "example": "en",
+          "description": "The 2-letter language code used for the subaccount."
+        },
+        "employeeCount": {
+          "type": "string",
+          "example": "1-49",
+          "description": "The number of employees. Possible values are: 1-49, 50-149, 150-249, 250-499, 500-749, 750-999, 1000+"
         }
       }
     },
