@@ -85,7 +85,7 @@ class ApiClient {
    *
    * @param {object} opts
    * @param {number} retry
-   * @return {Promise}
+   * @return {string} - JSON string
    */
   async exec (opts, retry = this.defaultExecRetry) {
     return new Promise((resolve, reject) => {
@@ -101,6 +101,8 @@ class ApiClient {
               await this.oauth.sendRefreshToken()
               this.exec(opts, retry).then(resolve).catch(reject)
             }, wait)
+          } else if (this.isNotFound(e)) {
+            resolve(e.response.text)
           } else {
             const err = new ApiClientExecError()
             err.req = opts
@@ -134,6 +136,14 @@ class ApiClient {
    */
   isUnauthorized (e) {
     return typeof e === 'object' && e.status === 401
+  }
+
+  /**
+   * @param {Error} e
+   * @return {boolean}
+   */
+  isNotFound (e) {
+    return typeof e === 'object' && e.status === 404
   }
 
   /**

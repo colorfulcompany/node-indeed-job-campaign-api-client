@@ -76,35 +76,79 @@ describe('ApiClient', () => {
     describe('execute error occured', () => {
       var spyIsUnthorized
 
-      beforeEach(async () => {
-        const e = new Error()
-        e.status = 401
-
+      /**
+       * @param {object} e - Error
+       * @return {void}
+       */
+      function ApiRejected (e) {
         sinon.stub(client, 'api').get(() => {
           return Promise.reject(e)
         })
-        // prepare retrying
-        spyIsUnthorized = sinon.spy(client, 'isUnauthorized')
-        sinon.mock(client).expects('execRetryWait').atLeast(1).returns(0)
-        sinon.stub(client.oauth, 'sendRefreshToken').callsFake(() => {})
+      }
+      afterEach(() => { sinon.restore() })
+
+      describe('401 Not Authorized', () => {
+        beforeEach(() => {
+          const e = new Error()
+          e.status = 401
+          ApiRejected(e)
+
+          // prepare retrying
+          spyIsUnthorized = sinon.spy(client, 'isUnauthorized')
+          sinon.mock(client).expects('execRetryWait').atLeast(1).returns(0)
+          sinon.stub(client.oauth, 'sendRefreshToken').callsFake(() => {})
+        })
+
+        it('ApiclientExecError', () => {
+          assert.rejects(
+            async () => client.exec({}),
+            { name: 'ApiClientExecError' }
+          )
+        })
+
+        it('rejected and retried ', async () => {
+          try {
+            await client.exec({})
+          } catch (e) {
+            assert.deepEqual(e.req, {})
+            assert.equal(e.swaggerError.status, 401)
+            assert(spyIsUnthorized.called)
+          }
+          sinon.verify()
+        })
       })
 
-      it('ApiclientExecError', () => {
-        assert.rejects(
-          async () => client.exec({}),
-          { name: 'ApiClientExecError' }
-        )
-      })
-
-      it('rejected and retried ', async () => {
-        try {
-          await client.exec({})
-        } catch (e) {
-          assert.deepEqual(e.req, {})
-          assert.equal(e.swaggerError.status, 401)
-          assert(spyIsUnthorized.called)
-        }
-        sinon.verify()
+      describe('404 Not Found', () => {
+        beforeEach(async () => {
+          const e = new Error()
+          e.status = 404
+          // copied from ttps://opensource.indeedeng.io/api-documentation/docs/campaigns/ref/#/Campaign%20management/showCampaignInfo
+          e.response = {}
+          const response = {
+            meta: {
+              status: 404,
+              errors: {
+                type: 'NOT_FOUND',
+                description: 'Resource not found.'
+              },
+              rootLocation: 'https://employers.indeed.com/api',
+              perPage: null,
+              links: {
+                rel: 'up',
+                href: 'v1/campaigns'
+              }
+            },
+            data: null
+          }
+          e.response.data = response
+          e.response.text = JSON.stringify(response)
+          ApiRejected(e)
+          sinon.mock(client).expects('execRetryWait').never()
+        })
+        it('no ApiClientExecError', async () => {
+          assert.equal(JSON.parse(await client.exec({})).meta.errors.type, 'NOT_FOUND')
+          sinon.verify()
+        })
       })
     })
 
