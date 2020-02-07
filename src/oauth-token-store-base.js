@@ -16,23 +16,23 @@ class OAuthTokenStoreBase {
     ]
   }
 
-  clear () {
+  async clear () {
     throw new NotImplemented()
   }
 
-  renew (tokens) {
+  async renew (tokens) {
     throw new NotImplemented()
   }
 
-  access_token () {
+  async access_token () {
     throw new NotImplemented()
   }
 
-  token_type () {
+  async token_type () {
     throw new NotImplemented()
   }
 
-  get updatedAt () {
+  async updatedAt () {
     throw new NotImplemented()
   }
 }

@@ -15,7 +15,7 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
     this.path = path
   }
 
-  clear () {
+  async clear () {
     this.renew({})
   }
 
@@ -24,21 +24,23 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
    * @param {object} updatedAt
    * @return {void}
    */
-  renew (tokens, updatedAt = moment()) {
+  async renew (tokens, updatedAt = moment()) {
     const data = { updatedAt }
     this.keys.forEach((key) => {
       data[key] = tokens[key]
     })
 
     fs.writeFileSync(this.path, JSON.stringify(data))
+
+    return Promise.resolve()
   }
 
   /**
    * @return {string|undefined}
    */
-  access_token () {
+  async access_token () {
     const props = this.load()
-    const updatedAt = this.updatedAt
+    const updatedAt = await this.updatedAt()
     const m = moment
 
     if (props && typeof props.access_token !== 'undefined') {
@@ -52,7 +54,7 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
   /**
    * @return {string|undefined}
    */
-  token_type () {
+  async token_type () {
     const props = this.load()
 
     if (props && typeof props.token_type !== 'undefined') return props.token_type
@@ -73,7 +75,7 @@ class OAuthTokenStorePlainFile extends OAuthTokenStoreBase {
   /**
    * @return {object|undefined}
    */
-  get updatedAt () {
+  async updatedAt () {
     const props = this.load()
     if (props && typeof props.updatedAt !== 'undefined') {
       return moment.utc(props.updatedAt)

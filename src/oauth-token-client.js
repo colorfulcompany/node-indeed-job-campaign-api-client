@@ -21,13 +21,12 @@ class OAuthTokenClient {
     this.setRedirectUri(config.redirect_uri)
 
     this._tokenWillExpiredAt = undefined
+  }
 
-    const opts = {
-      ...this.defaultConfig,
-      ...config
-    }
-    this.setTokens(opts)
-
+  /**
+   * @param {object} opts
+   */
+  initOAuthClient (opts) {
     this.oauth = new OAuth2(
       opts.client_id,
       opts.client_secret,
@@ -35,6 +34,23 @@ class OAuthTokenClient {
       opts.authorizePath,
       opts.accessTokenPath
     )
+  }
+
+  /**
+   * @param {object} store
+   * @param {object} config
+   * @return {object}
+   */
+  static async create (store = {}, config = {}) {
+    const client = new this(store, config)
+    const opts = {
+      ...client.defaultConfig,
+      ...config
+    }
+    await client.setTokens(opts)
+    client.initOAuthClient(opts)
+
+    return client
   }
 
   /**
@@ -136,7 +152,7 @@ redirect_uri
    * @param {object} config
    * @return {undefined}
    */
-  setTokens (config) {
+  async setTokens (config) {
     const tokens = { token_type: this.defaultTokenType, ...config }
 
     const tokenInfo = {}
@@ -148,7 +164,8 @@ redirect_uri
         tokenInfo[key] = tokens[key]
       }
     })
-    this.store.renew(tokenInfo)
+
+    return this.store.renew(tokenInfo)
   }
 
   /**
@@ -161,8 +178,8 @@ redirect_uri
   /**
    * @return {boolean}
    */
-  isTokenExpired () {
-    return this.store.updatedAt && !this.store.access_token
+  async isTokenExpired () {
+    return this.store.updatedAt() && this.store.access_token()
   }
 
   /**
@@ -170,13 +187,13 @@ redirect_uri
    */
   async accessToken () {
     // need retry ?
-    if (this.isTokenEmpty() || this.isTokenExpired()) {
+    if (this.isTokenEmpty() || await this.isTokenExpired()) {
       await this.sendRefreshToken()
     }
 
     return {
-      token_type: this.store.token_type(),
-      access_token: this.store.access_token()
+      token_type: await this.store.token_type(),
+      access_token: await this.store.access_token()
     }
   }
 

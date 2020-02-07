@@ -3,15 +3,15 @@
 const OAuthTokenStoreBase = require('./oauth-token-store-base')
 
 class OAuthTokenStoreDumb extends OAuthTokenStoreBase {
-  clear () {}
+  async clear () {}
 
-  renew (tokens) {}
+  async renew (tokens) {}
 
-  access_token () { return '' }
+  async access_token () { return '' }
 
-  token_type () { return 'Bearer' }
+  async token_type () { return 'Bearer' }
 
-  get updatedAt () { return undefined }
+  async updatedAt () { return undefined }
 }
 
 module.exports = OAuthTokenStoreDumb

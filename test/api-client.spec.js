@@ -31,7 +31,7 @@ describe('ApiClient', () => {
   })
 
   beforeEach(async () => {
-    oauth = createOAuthClient(new OAuthTokenStoreDumb(), mockController.host, mockController.port)
+    oauth = await createOAuthClient(new OAuthTokenStoreDumb(), mockController.host, mockController.port)
     client = await ApiClient.create(oauth, { specPath: localDummyClientSpec() })
   })
 

@@ -56,8 +56,8 @@ describe('OAuthTokenClient', () => {
       await mockController.stop()
     })
 
-    beforeEach(() => {
-      client = createOAuthClient(new TestingOAuthTokenStore(), mockController.host, mockController.port)
+    beforeEach(async () => {
+      client = await createOAuthClient(new TestingOAuthTokenStore(), mockController.host, mockController.port)
     })
 
     describe('refresh token ', () => {
@@ -146,7 +146,7 @@ describe('OAuthTokenClient', () => {
     describe('#setTokens', () => {
       describe('empty', () => {
         it('return always undefined and accessToken() from store', async () => {
-          assert.equal(client.setTokens({}), undefined)
+          assert.equal(await client.setTokens({}), undefined)
           assert.deepEqual(
             await client.accessToken(),
             {
