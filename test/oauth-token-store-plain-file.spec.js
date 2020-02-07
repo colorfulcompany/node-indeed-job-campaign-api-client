@@ -42,11 +42,11 @@ describe('OAuthTokenStorePlainFile', () => {
   })
 
   describe('#clear()', () => {
-    beforeEach(() => {
-      store.renew(tokenInfos())
+    beforeEach(async () => {
+      await store.renew(tokenInfos())
     })
-    it('only updatedAt prop exists', () => {
-      store.clear()
+    it('only updatedAt prop exists', async () => {
+      await store.clear()
       assert.deepEqual(Object.keys(store.load()), ['updatedAt'])
     })
   })
@@ -58,8 +58,8 @@ describe('OAuthTokenStorePlainFile', () => {
       })
     })
     describe('once', () => {
-      beforeEach(() => {
-        store.renew(tokenInfos())
+      beforeEach(async () => {
+        await store.renew(tokenInfos())
       })
       it('return object', () => {
         assert.equal(typeof store.load(), 'object')
@@ -68,17 +68,17 @@ describe('OAuthTokenStorePlainFile', () => {
     describe('twice', () => {
       let updatedAt
       beforeEach(async () => {
-        store.renew(tokenInfos())
-        updatedAt = moment(store.load().updatedAt) // clone
+        await store.renew(tokenInfos())
+        updatedAt = moment(await store.updatedAt()) // clone
         await sleep(100)
-        store.renew(tokenInfos())
+        await store.renew(tokenInfos())
       })
-      it('updatedAt has been chaged', () => {
-        assert(updatedAt < store.updatedAt)
+      it('updatedAt has been chaged', async () => {
+        assert(updatedAt < await store.updatedAt())
       })
     })
     describe('given refresh_token', () => {
-      beforeEach(() => { store.renew(tokenInfos()) })
+      beforeEach(async () => store.renew(tokenInfos()))
 
       it('should be ignored', () => {
         assert.equal(Object.keys(store.load()).indexOf('refresh_token'), -1)
@@ -88,46 +88,46 @@ describe('OAuthTokenStorePlainFile', () => {
 
   describe('#access_token()', () => {
     describe('before renew', () => {
-      it('return undefined', () => {
-        assert.equal(store.access_token(), undefined)
+      it('return undefined', async () => {
+        assert.equal(await store.access_token(), undefined)
       })
     })
 
     describe('before expired', () => {
-      beforeEach(() => {
-        store.renew(tokenInfos())
+      beforeEach(async () => {
+        await store.renew(tokenInfos())
       })
-      it('can fetch access_token', () => {
-        assert(store.access_token())
+      it('can fetch access_token', async () => {
+        assert(await store.access_token())
       })
     })
 
     describe('after expired', () => {
       beforeEach(async () => {
-        store.renew({
+        await store.renew({
           ...tokenInfos({ expires_in: 10 })
         })
         await sleep(50)
       })
       it('return undefined', async () => {
-        assert.equal(store.access_token(), undefined)
+        assert.equal(await store.access_token(), undefined)
       })
     })
   })
 
   describe('#updatedAt', () => {
     describe('before renew', () => {
-      it('undefined', () => {
-        assert.equal(store.updatedAt, undefined)
+      it('undefined', async () => {
+        assert.equal(await store.updatedAt(), undefined)
       })
     })
 
     describe('after renew', () => {
-      beforeEach(() => {
-        store.renew(tokenInfos())
+      beforeEach(async () => {
+        await store.renew(tokenInfos())
       })
-      it('moment object', () => {
-        assert.equal(typeof store.updatedAt, 'object')
+      it('moment object', async () => {
+        assert.equal(typeof await store.updatedAt(), 'object')
       })
     })
   })

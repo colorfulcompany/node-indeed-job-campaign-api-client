@@ -67,8 +67,8 @@ function paramForRefreshingToken () {
  * @param {number} port
  * @return {object}
  */
-function createOAuthClient (store, host, port) {
-  return new OAuthTokenClient(
+async function createOAuthClient (store, host, port) {
+  return OAuthTokenClient.create(
     store,
     {
       ...paramForRefreshingToken(),
