@@ -215,11 +215,11 @@ redirect_uri
         this.oauth.getOAuthAccessToken(
           RT,
           this.refreshParams,
-          (err, access_token, none, results) => {
+          async (err, access_token, none, results) => {
             if (err) {
               return reject(err)
             } else {
-              this.setTokens({ refresh_token: RT, ...results })
+              await this.setTokens({ refresh_token: RT, ...results })
               resolve(results)
             }
           }
