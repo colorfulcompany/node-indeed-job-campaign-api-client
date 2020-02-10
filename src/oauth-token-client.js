@@ -47,8 +47,10 @@ class OAuthTokenClient {
       ...client.defaultConfig,
       ...config
     }
-    await client.setTokens(opts)
+    const access_token = await store.access_token()
+    if (access_token) opts.access_token = access_token
     client.initOAuthClient(opts)
+    await client.setTokens(opts)
 
     return client
   }

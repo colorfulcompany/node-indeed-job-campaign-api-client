@@ -95,6 +95,7 @@ class ApiClient {
           resolve(r.data)
         }).catch(async (e) => {
           if (retry > 0 && this.isUnauthorized(e)) {
+            console.debug(`retrying Indeed API ... rest ${retry}`)
             retry--
             const wait = this.execRetryWait(retry)
             setTimeout(async () => {
