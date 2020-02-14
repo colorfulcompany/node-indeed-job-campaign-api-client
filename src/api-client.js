@@ -94,16 +94,17 @@ class ApiClient {
           const r = await client.execute({ ...opts, ...this.httpOpts })
           resolve(r.data)
         }).catch(async (e) => {
-          if (retry > 0 && this.isUnauthorized(e)) {
+          if (this.isNotFound(e)) {
+            resolve(e.response.text)
+          } else if (retry > 0) {
             console.debug(`retrying Indeed API ... rest ${retry}`)
             retry--
+
+            if (this.isUnauthorized(e)) await this.oauth.sendRefreshToken()
             const wait = this.execRetryWait(retry)
             setTimeout(async () => {
-              await this.oauth.sendRefreshToken()
               this.exec(opts, retry).then(resolve).catch(reject)
             }, wait)
-          } else if (this.isNotFound(e)) {
-            resolve(e.response.text)
           } else {
             const err = new ApiClientExecError()
             err.req = opts
