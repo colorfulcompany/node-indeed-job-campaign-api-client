@@ -97,7 +97,11 @@ class ApiClient {
           if (this.isNotFound(e)) {
             resolve(e.response.text)
           } else if (retry > 0) {
-            console.debug(`retrying Indeed API ... rest ${retry}`)
+            console.debug(JSON.stringify({
+              message: `retrying Indeed API ... rest ${retry}`,
+              requestOpts: opts,
+              responseHeaders: e.headers
+            }))
             retry--
 
             if (this.isUnauthorized(e)) await this.oauth.sendRefreshToken()
