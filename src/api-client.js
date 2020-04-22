@@ -100,7 +100,7 @@ class ApiClient {
             console.debug({
               message: `retrying Indeed API ... rest ${retry}`,
               requestOpts: opts,
-              responseHeaders: e.response
+              error: e
             })
             retry--
 
