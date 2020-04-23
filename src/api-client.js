@@ -94,7 +94,12 @@ class ApiClient {
           const r = await client.execute({ ...opts, ...this.httpOpts })
           resolve(r.data)
         }).catch(async (e) => {
-          if (this.isNotFound(e)) {
+          if (this.isTimeout(e)) {
+            const err = new ApiClientExecError()
+            err.req = opts
+            err.swaggerError = e
+            return reject(err)
+          } else if (this.isNotFound(e)) {
             resolve(e.response.text)
           } else if (retry > 0) {
             console.debug({
@@ -150,6 +155,14 @@ class ApiClient {
    */
   isNotFound (e) {
     return typeof e === 'object' && e.status === 404
+  }
+
+  /**
+   * @param {Error} e
+   * @return {boolean}
+   */
+  isTimeout (e) {
+    return e && e.errno === 'ETIMEDOUT' && e.code === 'ETIMEDOUT'
   }
 
   /**
