@@ -98,7 +98,6 @@ class ApiClient {
             resolve(e.response.text)
           } else if (retry > 0) {
             console.debug({
-              message: `retrying Indeed API ... rest ${retry}`,
               requestOpts: opts,
               error: e
             })
@@ -107,6 +106,7 @@ class ApiClient {
             if (this.isUnauthorized(e)) await this.oauth.sendRefreshToken()
             const wait = this.execRetryWait(retry)
             setTimeout(async () => {
+              console.debug(`retrying Indeed API ... rest ${retry}`)
               this.exec(opts, retry).then(resolve).catch(reject)
             }, wait)
           } else {
