@@ -1,6 +1,7 @@
 const path = require('path')
 const Swagger = require('swagger-client')
 const ky = require('ky-universal')
+const fetch = require('node-fetch')
 
 class ApiClientExecError extends Error {
   get name () { return 'ApiClientExecError' }
@@ -14,6 +15,7 @@ class ApiClient {
   constructor (oauth = {}, opts = {}) {
     this.oauth = oauth
     this.opts = opts
+    this.timeout = opts.timeout || 10000
     this.api = undefined
   }
 
@@ -91,21 +93,18 @@ class ApiClient {
     return new Promise((resolve, reject) => {
       this.api
         .then(async (client) => {
-          const r = await client.execute({ ...opts, ...this.httpOpts })
+          const r = await client.execute({
+            userFetch: this.fetch.bind(this), ...opts, ...this.httpOpts
+          })
           resolve(r.data)
         }).catch(async (e) => {
-          if (this.isTimeout(e)) {
-            const err = new ApiClientExecError()
-            err.req = opts
-            err.swaggerError = e
-            return reject(err)
-          } else if (this.isNotFound(e)) {
+          if (this.isNotFound(e)) {
             resolve(e.response.text)
           } else if (retry > 0) {
-            console.debug({
+            console.debug(JSON.stringify({
               requestOpts: opts,
               error: e
-            })
+            }))
             retry--
 
             if (this.isUnauthorized(e)) await this.oauth.sendRefreshToken()
@@ -158,14 +157,6 @@ class ApiClient {
   }
 
   /**
-   * @param {Error} e
-   * @return {boolean}
-   */
-  isTimeout (e) {
-    return e && e.errno === 'ETIMEDOUT' && e.code === 'ETIMEDOUT'
-  }
-
-  /**
    * @return {object}
    */
   get httpOpts () {
@@ -189,6 +180,20 @@ class ApiClient {
     }
 
     return req
+  }
+
+  /**
+   * @param {string} url
+   * @param {object} req
+   * @return {object}
+   */
+  async fetch (url, req) {
+    return fetch(url, {
+      headers: req.headers,
+      method: req.method,
+      body: req.body,
+      timeout: this.timeout
+    })
   }
 }
 
