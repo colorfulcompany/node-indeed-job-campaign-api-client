@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const assert = require('power-assert')
 const sinon = require('sinon')
+const sleep = require('sleep-promise')
 
 const OAuth2MockServerController = require('./support/oauth2-mock-server-controller')
 const OAuthTokenStoreDumb = require('oauth-token-store-dumb')
@@ -18,6 +19,7 @@ const {
   productionClientSpec, // eslint-disable-line
   createOAuthClient
 } = require(path.join(__dirname, 'support/util'))
+const DummyServer = require(path.join(__dirname, 'support/dummy-server'))
 
 describe('ApiClient', () => {
   var mockController, client, oauth
@@ -149,6 +151,29 @@ describe('ApiClient', () => {
           assert.equal(JSON.parse(await client.exec({})).meta.errors.type, 'NOT_FOUND')
           sinon.verify()
         })
+      })
+    })
+
+    describe('timeout', function () {
+      this.timeout(12000)
+
+      let server
+      beforeEach(async () => {
+        client = await ApiClient.create(oauth, {
+          specPath: localDummyClientSpec(),
+          timeout: 1000
+        })
+        server = DummyServer.run()
+        await sleep(1000)
+      })
+      afterEach(async () => server.close())
+
+      it('swaggerError.type is request-timeout', async () => {
+        try {
+          await client.employer()
+        } catch (e) {
+          assert.equal(e.swaggerError.type, 'request-timeout')
+        }
       })
     })
 
