@@ -48,7 +48,7 @@ describe('ApiClient', () => {
     this.timeout(10000)
 
     beforeEach(async () => {
-      oauth = new OAuthTokenClient(new OAuthTokenStorePlainFile(path.join(__dirname, '../tmp/token-store.json')))
+      oauth = await OAuthTokenClient.create(new OAuthTokenStorePlainFile(path.join(__dirname, '../tmp/token-store.json')))
     })
 
     it('', async () => {
