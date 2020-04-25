@@ -15,7 +15,8 @@ class ApiClient {
   constructor (oauth = {}, opts = {}) {
     this.oauth = oauth
     this.opts = opts
-    this.timeout = opts.timeout || 10000
+    this.timeout = opts.timeout || 5000
+    this.retryWaitBase = opts.retryWaitBase || 5000
     this.api = undefined
   }
 
@@ -137,7 +138,7 @@ class ApiClient {
   execRetryWait (retry) {
     const d = this.defaultExecRetry
 
-    return ((d - retry > 0) ? (d - retry) : d) * 1000
+    return ((d - retry > 0) ? (d - retry) : d) * this.retryWaitBase
   }
 
   /**

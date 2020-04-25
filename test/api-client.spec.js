@@ -34,7 +34,7 @@ describe('ApiClient', () => {
 
   beforeEach(async () => {
     oauth = await createOAuthClient(new OAuthTokenStoreDumb(), mockController.host, mockController.port)
-    client = await ApiClient.create(oauth, { specPath: localDummyClientSpec() })
+    client = await ApiClient.create(oauth, { specPath: localDummyClientSpec(), retryWaitBase: 1000 })
   })
 
   /**
@@ -161,7 +161,8 @@ describe('ApiClient', () => {
       beforeEach(async () => {
         client = await ApiClient.create(oauth, {
           specPath: localDummyClientSpec(),
-          timeout: 1000
+          timeout: 1000,
+          retryWaitBase: 1000
         })
         server = DummyServer.run()
         await sleep(1000)
@@ -200,7 +201,12 @@ describe('ApiClient', () => {
   })
 
   describe('#execRetryWait', () => {
-    beforeEach(() => { // fixed
+    beforeEach(async () => { // fixed
+      client = await ApiClient.create(oauth, {
+        specPath: localDummyClientSpec(),
+        timeout: 1000,
+        retryWaitBase: 1000
+      })
       sinon.stub(client, 'defaultExecRetry').returns(3)
     })
 
