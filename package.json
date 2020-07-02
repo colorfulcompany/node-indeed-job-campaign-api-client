@@ -22,6 +22,7 @@
     "sleep-promise": "^8.0.1"
   },
   "dependencies": {
+    "acorn": "7.1.1",
     "ky": "^0.16.2",
     "ky-universal": "^0.3.0",
     "minimist": "1.2.5",
