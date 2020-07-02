@@ -24,6 +24,7 @@
   "dependencies": {
     "ky": "^0.16.2",
     "ky-universal": "^0.3.0",
+    "minimist": "1.2.5",
     "moment": "^2.24.0",
     "oauth": "^0.9.15",
     "swagger-client": "^3.9.5"
